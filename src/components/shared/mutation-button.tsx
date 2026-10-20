@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ConfirmationDialog } from "./confirmation-dialog";
 import { FormMessage } from "./form-message";
 import type { ActionResult } from "@/lib/actions/result";
+import { useToastManager } from "./app-toasts";
 export function MutationButton({
   label,
   description,
@@ -19,6 +20,7 @@ export function MutationButton({
   className?: string;
 }) {
   const router = useRouter();
+  const toasts = useToastManager();
   const [message, setMessage] = useState<{
     status: "success" | "error";
     text: string;
@@ -35,9 +37,14 @@ export function MutationButton({
         description={description}
         confirmLabel={label}
         onConfirm={async () => {
+          setMessage(undefined);
           const result = await action(input);
-          setMessage({ status: result.status, text: result.message });
-          if (result.status === "success") router.refresh();
+          if (result.status === "success") {
+            toasts.add({ title: result.message });
+            router.refresh();
+          } else {
+            setMessage({ status: "error", text: result.message });
+          }
           return result.status === "success";
         }}
       />

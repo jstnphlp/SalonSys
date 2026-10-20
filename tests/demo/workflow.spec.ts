@@ -35,6 +35,20 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
     ).toHaveCount(0);
     await expect(page.locator("h1")).toBeVisible();
   }
+  await page.goto("/services");
+  await page.getByRole("button", { name: "Add service", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Save changes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Enter a service name.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Enter a category.", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText(/Too small:|expected string/)).toHaveCount(0);
+  await page.keyboard.press("Escape");
   await page.goto("/customers");
   await page.getByRole("button", { name: "Add customer", exact: true }).click();
   const customerName = `Demo client ${Date.now()}`;
@@ -83,9 +97,22 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
   await expect(dialog.getByText(/45 minutes including buffer/)).toBeVisible();
   await dialog.getByRole("button", { name: "Save appointment" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
+  const notifications = page.getByRole("region", { name: "Notifications" });
+  await expect(
+    notifications.getByText("Appointment saved.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    notifications.getByText("Appointment saved.", { exact: true }),
+  ).toHaveCount(0, { timeout: 8000 });
   await page.getByRole("button").filter({ hasText: name }).first().click();
-  for (const label of ["Check in", "Start service", "Mark completed"])
+  for (const label of ["Check in", "Start service", "Mark completed"]) {
     await confirm(page, label);
+    await expect(
+      page
+        .getByRole("dialog")
+        .getByText("Appointment updated.", { exact: true }),
+    ).toHaveCount(0);
+  }
   await page.keyboard.press("Escape");
   await page
     .getByLabel("View demo as")
@@ -120,6 +147,10 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
   await dialog.getByRole("button", { name: "Calculate preview" }).click();
   await expect(page).toHaveURL(/\/payroll\/[a-f0-9-]+$/);
   await expect(page.getByText(/Haircut & finish/).first()).toBeVisible();
+  await expect(
+    page.getByText(/10% of .*350\.00 service price/).first(),
+  ).toBeVisible();
+  await expect(page.getByText(/"type"\s*:/)).toHaveCount(0);
   await confirm(page, "Mark reviewed");
   await confirm(page, "Approve payroll");
   await page.getByRole("button", { name: "Mark paid", exact: true }).click();
@@ -136,10 +167,18 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
     .selectOption("00000000-0000-4000-8000-000000000003");
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto("/my-payslips");
-  await page.getByRole("link", { name: "View payslip" }).first().click();
+  await page
+    .getByText(`${today} → ${today}`, { exact: true })
+    .locator("..")
+    .getByRole("link", { name: "View payslip" })
+    .click();
   await expect(
     page.getByRole("button", { name: "Print payslip" }),
   ).toBeVisible();
+  await expect(
+    page.getByText(/10% of .*350\.00 service price/).first(),
+  ).toBeVisible();
+  await expect(page.getByText(/"type"\s*:/)).toHaveCount(0);
   await expect(
     page.getByText("Sam Santos", { exact: true }).first(),
   ).toBeVisible();

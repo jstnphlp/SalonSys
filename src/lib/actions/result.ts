@@ -1,4 +1,5 @@
 import type { ZodError } from "zod";
+import { validationMessage } from "@/lib/validation-message";
 
 export type ActionResult<T = undefined> =
   | { status: "success"; message: string; data: T }
@@ -22,6 +23,15 @@ export function validationError(error: ZodError): ActionResult<never> {
   return {
     status: "error",
     message: "Check the highlighted fields and try again.",
-    fieldErrors: flattened.fieldErrors,
+    fieldErrors: Object.fromEntries(
+      Object.entries(flattened.fieldErrors).map(([field, messages]) => [
+        field,
+        Array.isArray(messages)
+          ? messages.map((message: unknown) =>
+              validationMessage(message, field.replaceAll("_", " ")),
+            )
+          : [],
+      ]),
+    ),
   };
 }

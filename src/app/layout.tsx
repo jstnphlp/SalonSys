@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import "./globals.css";
 import { appConfig } from "@/config/app";
 import { cn } from "@/lib/utils";
+import { AppToasts } from "@/components/shared/app-toasts";
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +22,9 @@ export default function RootLayout({
       className={cn("h-full font-sans antialiased", "font-sans")}
       data-scroll-behavior="smooth"
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <AppToasts>{children}</AppToasts>
+      </body>
     </html>
   );
 }

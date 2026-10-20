@@ -2,11 +2,27 @@ import { z } from "zod";
 import { money } from "@/features/salon/schemas";
 export const serviceSchema = z.object({
   id: z.uuid().optional(),
-  name: z.string().trim().min(1).max(120),
-  category: z.string().trim().min(1).max(80),
+  name: z
+    .string({ error: "Enter a service name." })
+    .trim()
+    .min(1, "Enter a service name.")
+    .max(120, "Keep the service name to 120 characters or fewer."),
+  category: z
+    .string({ error: "Enter a category." })
+    .trim()
+    .min(1, "Enter a category.")
+    .max(80, "Keep the category to 80 characters or fewer."),
   price_php: money,
-  duration_minutes: z.number().int().min(5).max(720),
-  buffer_minutes: z.number().int().min(0).max(180),
+  duration_minutes: z
+    .number({ error: "Enter the service duration in minutes." })
+    .int("Use whole minutes for the duration.")
+    .min(5, "Services must last at least 5 minutes.")
+    .max(720, "Service duration cannot exceed 720 minutes."),
+  buffer_minutes: z
+    .number({ error: "Enter the cleanup time in minutes, or 0 for none." })
+    .int("Use whole minutes for cleanup time.")
+    .min(0, "Cleanup time cannot be negative.")
+    .max(180, "Cleanup time cannot exceed 180 minutes."),
   active: z.boolean(),
 });
 export const serviceRowSchema = serviceSchema.extend({

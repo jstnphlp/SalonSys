@@ -19,6 +19,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { ActionResult } from "@/lib/actions/result";
+import { validationMessage } from "@/lib/validation-message";
+import { useToastManager } from "./app-toasts";
 
 export type Field = {
   name: string;
@@ -65,6 +67,7 @@ export function RecordForm({
   preview,
 }: RecordFormProps) {
   const router = useRouter();
+  const toasts = useToastManager();
   const [pending, start] = useTransition();
   const [message, setMessage] = useState<{
     status: "success" | "error";
@@ -89,13 +92,15 @@ export function RecordForm({
         start(async () => {
           setMessage(undefined);
           const result = await action(input);
-          setMessage({ status: result.status, text: result.message });
-          if (result.status === "error")
+          if (result.status === "error") {
+            setMessage({ status: "error", text: result.message });
             for (const [field, messages] of Object.entries(
               result.fieldErrors ?? {},
             ))
               setError(field, { message: messages.join(" ") });
+          }
           if (result.status === "success") {
+            toasts.add({ title: result.message });
             router.refresh();
             onSuccess?.(result.data);
           }
@@ -110,9 +115,9 @@ export function RecordForm({
         {fields.map((field) => {
           const id = `field-${field.name}`;
           const fieldValue = values[field.name];
-          const error =
-            errors[field.name]?.message ??
-            (errors[field.name] ? "Check this field." : undefined);
+          const error = errors[field.name]
+            ? validationMessage(errors[field.name]?.message, field.label)
+            : undefined;
           return (
             <div
               className={
@@ -284,7 +289,7 @@ export function RecordForm({
         <FormMessage status="error">
           {Object.entries(errors)
             .filter(([k]) => !fields.some((f) => f.name === k))
-            .map(([, v]) => String(v?.message ?? "Check your entries."))
+            .map(([, v]) => validationMessage(v?.message, "your entries"))
             .join(" ")}
         </FormMessage>
       )}
