@@ -66,7 +66,7 @@ export function ScheduleGrid({
     <div
       role="region"
       aria-label="Appointment calendar"
-      className="overflow-x-auto rounded-[14px] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)] ring-1 ring-border/70"
+      className="overflow-x-auto rounded-[14px] bg-card shadow-[0_1px_2px_rgba(15,23,42,0.03)] ring-1 ring-border/70"
     >
       <div style={{ minWidth: Math.max(540, columns.length * 145 + 64) }}>
         <div

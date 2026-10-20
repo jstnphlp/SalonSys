@@ -392,7 +392,7 @@ export function AppointmentCalendar({
               variant="ghost"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className={`h-8 rounded-[10px] px-3 text-xs capitalize ${view === v ? "bg-white shadow-sm" : "text-muted-foreground"}`}
+              className={`h-8 rounded-[10px] px-3 text-xs capitalize ${view === v ? "bg-accent text-accent-foreground shadow-sm" : "text-muted-foreground"}`}
             >
               {v}
             </Button>

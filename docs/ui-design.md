@@ -10,9 +10,9 @@
 
 ## Design direction
 
-The implemented UI follows the local DentalSys reference in `Documents/projects/DentalSys`: a 230px sidebar, inset rounded white workspace, locally hosted Inter, charcoal primary controls, compact type and navigation, flat metric surfaces, table-led overview, and hour-grid calendar. Salon terminology, permissions and persisted workflows remain in SalonSys; DentalSys is a visual reference rather than an application dependency. Demo controls sit quietly in the top bar. Mobile uses the matching bottom navigation plus a drawer.
+The implemented layout follows the local DentalSys reference in `Documents/projects/DentalSys`: a 230px sidebar, inset rounded workspace, locally hosted Inter, compact type and navigation, flat metric surfaces, table-led overview, and hour-grid calendar. SalonSys has its own shared palette for hair and nail salons: warm ivory surfaces, soft mauve navigation, deep plum primary actions and text accents, and warm stone secondary surfaces. Semantic CSS tokens apply these colors consistently across both salon types; service and status colors remain distinct and labeled. Salon terminology, permissions and persisted workflows remain in SalonSys; DentalSys is a layout reference rather than an application dependency. Demo controls sit quietly in the top bar. Mobile uses the matching bottom navigation plus a drawer.
 
-Clean modern SaaS operations dashboard. Near-white canvas, strong charcoal text, subtle separators and service/status accents; high contrast focus states. Flat controls with restrained rounded corners, no fake 3D/clay buttons, heavy gradients, random stock avatars, emoji navigation or aggressive shadows. Use existing Tailwind CSS, CSS semantic tokens and locally owned shadcn-style primitives instead of a new UI framework. Dark mode is optional after MVP.
+Clean modern SaaS operations dashboard. Ivory canvas, strong warm ink text, subtle mauve separators and service/status accents; high contrast focus states. Flat controls with restrained rounded corners, no fake 3D/clay buttons, heavy gradients, random stock avatars, emoji navigation or aggressive shadows. Use existing Tailwind CSS, CSS semantic tokens and locally owned shadcn-style primitives instead of a new UI framework. Dark mode is optional after MVP; its tokens use the same plum and mauve family.
 
 ## Shell and navigation
 

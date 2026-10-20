@@ -173,8 +173,8 @@ export function AppShell({
           className={cn(
             "group flex min-h-9 w-full items-center gap-3 rounded-[11px] px-3 py-2 text-[13px] font-medium transition-all duration-200",
             active(n.href)
-              ? "bg-white text-primary shadow-[0_1px_2px_rgba(20,50,47,0.08)] ring-1 ring-black/[0.04]"
-              : "text-muted-foreground hover:bg-white/70 hover:text-foreground",
+              ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm ring-1 ring-primary/10"
+              : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground",
           )}
         >
           <n.icon
@@ -198,7 +198,7 @@ export function AppShell({
           <button
             type="button"
             aria-label={`Open account menu for ${user.fullName}`}
-            className="group flex w-full items-center gap-2 rounded-[13px] px-2 py-2 text-left transition-colors outline-none hover:bg-white/70 focus-visible:ring-2 focus-visible:ring-ring/30 data-popup-open:bg-white"
+            className="group flex w-full items-center gap-2 rounded-[13px] px-2 py-2 text-left transition-colors outline-none hover:bg-sidebar-accent/60 focus-visible:ring-2 focus-visible:ring-ring/30 data-popup-open:bg-sidebar-accent"
           />
         }
       >
@@ -219,7 +219,7 @@ export function AppShell({
         side="top"
         align="start"
         sideOffset={8}
-        className="w-[248px] rounded-[16px] bg-white p-1.5 shadow-[0_18px_60px_rgba(15,23,42,0.16)]"
+        className="w-[248px] rounded-[16px] bg-popover p-1.5 shadow-[0_18px_60px_rgba(15,23,42,0.16)]"
       >
         <DropdownMenuGroup>
           <DropdownMenuLabel className="px-2.5 py-2.5">
@@ -276,7 +276,7 @@ export function AppShell({
     <div className="workspace-shell flex h-dvh min-h-0 w-full overflow-hidden bg-sidebar text-foreground">
       <a
         href="#main-content"
-        className="sr-only z-50 rounded-lg bg-white p-3 focus:not-sr-only focus:fixed"
+        className="sr-only z-50 rounded-lg bg-background p-3 focus:not-sr-only focus:fixed"
       >
         Skip to content
       </a>
@@ -302,8 +302,8 @@ export function AppShell({
         </div>
       </aside>
       <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden p-3 lg:pl-0">
-        <section className="workspace-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[18px] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:rounded-[22px]">
-          <header className="flex min-h-[60px] shrink-0 flex-wrap items-center gap-3 bg-white/90 px-4 py-2 backdrop-blur md:px-7 xl:px-9">
+        <section className="workspace-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[18px] bg-background shadow-[0_1px_2px_rgba(15,23,42,0.04)] lg:rounded-[22px]">
+          <header className="flex min-h-[60px] shrink-0 flex-wrap items-center gap-3 bg-background/90 px-4 py-2 backdrop-blur md:px-7 xl:px-9">
             <Button
               variant="ghost"
               size="icon"
@@ -327,7 +327,7 @@ export function AppShell({
               >
                 <Search className="size-3.5" />
                 <span>Search workspace...</span>
-                <kbd className="ml-auto rounded-md bg-white px-1.5 py-0.5 text-[9px] shadow-sm">
+                <kbd className="ml-auto rounded-md bg-card px-1.5 py-0.5 text-[9px] shadow-sm">
                   Ctrl K
                 </kbd>
               </button>
@@ -359,7 +359,7 @@ export function AppShell({
       </div>
       <nav
         aria-label="Mobile navigation"
-        className="fixed inset-x-3 bottom-3 z-30 grid grid-cols-5 rounded-[18px] bg-white/95 p-1.5 shadow-[0_12px_35px_rgba(15,23,42,0.14)] backdrop-blur lg:hidden"
+        className="fixed inset-x-3 bottom-3 z-30 grid grid-cols-5 rounded-[18px] bg-card/95 p-1.5 shadow-[0_12px_35px_rgba(15,23,42,0.14)] backdrop-blur lg:hidden"
       >
         {available
           .filter(

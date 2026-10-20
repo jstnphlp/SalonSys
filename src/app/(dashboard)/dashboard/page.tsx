@@ -188,7 +188,7 @@ export default async function DashboardPage() {
               <Link
                 key={item.label}
                 href={item.href}
-                className="group flex min-h-12 items-center gap-3 rounded-[11px] px-3 py-2 hover:bg-white/70"
+                className="group flex min-h-12 items-center gap-3 rounded-[11px] px-3 py-2 hover:bg-card/70"
               >
                 <span
                   className={cn("size-2 shrink-0 rounded-full", item.tone)}
