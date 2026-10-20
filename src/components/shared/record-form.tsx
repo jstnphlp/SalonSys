@@ -4,6 +4,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { useState, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -32,10 +33,16 @@ export type Field = {
     | "checkbox"
     | "select"
     | "multiple"
+    | "cards"
     | "textarea"
     | "hours"
     | "dates";
-  options?: { value: string; label: string }[];
+  options?: {
+    value: string;
+    label: string;
+    description?: string;
+    detail?: string;
+  }[];
   hint?: string;
   step?: string;
 };
@@ -102,6 +109,7 @@ export function RecordForm({
       <div className="grid gap-4 sm:grid-cols-2">
         {fields.map((field) => {
           const id = `field-${field.name}`;
+          const fieldValue = values[field.name];
           const error =
             errors[field.name]?.message ??
             (errors[field.name] ? "Check this field." : undefined);
@@ -110,15 +118,30 @@ export function RecordForm({
               className={
                 field.kind === "hours" ||
                 field.kind === "textarea" ||
-                field.kind === "multiple"
+                field.kind === "multiple" ||
+                field.kind === "cards"
                   ? "space-y-2 sm:col-span-2"
                   : "space-y-2"
               }
               key={field.name}
             >
-              <label htmlFor={id} className="text-sm font-medium">
-                {field.label}
-              </label>
+              {field.kind === "cards" ? (
+                <div className="flex items-center justify-between gap-2">
+                  <span id={`${id}-label`} className="text-sm font-medium">
+                    {field.label}
+                  </span>
+                  <span
+                    className="text-xs text-muted-foreground"
+                    aria-live="polite"
+                  >
+                    {Array.isArray(fieldValue) ? fieldValue.length : 0} selected
+                  </span>
+                </div>
+              ) : (
+                <label htmlFor={id} className="text-sm font-medium">
+                  {field.label}
+                </label>
+              )}
               {field.kind === "hours" ? (
                 <HoursEditor
                   value={
@@ -139,6 +162,62 @@ export function RecordForm({
                   type="checkbox"
                   {...register(field.name)}
                 />
+              ) : field.kind === "cards" ? (
+                <fieldset
+                  id={id}
+                  aria-labelledby={`${id}-label`}
+                  aria-describedby={
+                    [field.hint && `${id}-hint`, error && `${id}-error`]
+                      .filter(Boolean)
+                      .join(" ") || undefined
+                  }
+                  aria-invalid={!!error}
+                  className="grid max-h-64 gap-2 overflow-y-auto rounded-xl p-1 sm:grid-cols-2"
+                >
+                  {field.options?.length ? (
+                    field.options.map((option) => (
+                      <label
+                        key={option.value}
+                        className="group flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-card p-3 transition-colors hover:border-primary/40 hover:bg-muted/60 has-checked:border-primary/60 has-checked:bg-accent/60 has-focus-visible:ring-3 has-focus-visible:ring-ring/40"
+                      >
+                        <input
+                          type="checkbox"
+                          value={option.value}
+                          aria-label={option.label}
+                          aria-invalid={!!error}
+                          aria-describedby={error ? `${id}-error` : undefined}
+                          className="peer sr-only"
+                          {...register(field.name)}
+                        />
+                        <span
+                          aria-hidden="true"
+                          className="mt-0.5 grid size-4 shrink-0 place-items-center rounded-[5px] border border-input bg-background text-transparent peer-checked:border-primary peer-checked:bg-primary peer-checked:text-primary-foreground"
+                        >
+                          <Check className="size-3" strokeWidth={3} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[13px] leading-5 font-medium group-has-checked:text-accent-foreground">
+                            {option.label}
+                          </span>
+                          {option.description && (
+                            <span className="mt-0.5 block text-xs text-muted-foreground">
+                              {option.description}
+                            </span>
+                          )}
+                          {option.detail && (
+                            <span className="mt-2 block text-xs font-semibold text-primary">
+                              {option.detail}
+                            </span>
+                          )}
+                        </span>
+                      </label>
+                    ))
+                  ) : (
+                    <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground sm:col-span-2">
+                      No options available.
+                    </p>
+                  )}
+                </fieldset>
               ) : field.kind === "select" || field.kind === "multiple" ? (
                 <Select
                   id={id}
@@ -188,7 +267,9 @@ export function RecordForm({
                 />
               )}
               {field.hint && (
-                <p className="text-xs text-muted-foreground">{field.hint}</p>
+                <p id={`${id}-hint`} className="text-xs text-muted-foreground">
+                  {field.hint}
+                </p>
               )}
               {error && (
                 <p id={`${id}-error`} className="text-xs text-destructive">

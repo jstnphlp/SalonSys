@@ -72,9 +72,15 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
   const start = dialog.getByLabel("Start · Asia/Manila");
   const today = (await start.inputValue()).slice(0, 10);
   await start.fill(`${today}T16:00`);
-  await dialog
-    .getByLabel("Services (sequential)")
-    .selectOption("30000000-0000-4000-8000-000000000001");
+  await dialog.getByText("Haircut & finish", { exact: true }).click();
+  await dialog.getByText("Color consultation", { exact: true }).click();
+  await expect(dialog.getByText("2 selected", { exact: true })).toBeVisible();
+  await expect(dialog.getByText(/120 minutes including buffer/)).toBeVisible();
+  await dialog.getByText("Color consultation", { exact: true }).click();
+  await expect(
+    dialog.getByRole("checkbox", { name: "Haircut & finish", exact: true }),
+  ).toBeChecked();
+  await expect(dialog.getByText(/45 minutes including buffer/)).toBeVisible();
   await dialog.getByRole("button", { name: "Save appointment" }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByRole("button").filter({ hasText: name }).first().click();

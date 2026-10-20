@@ -141,16 +141,18 @@ export function AppointmentCalendar({
       {
         name: "service_ids",
         label: "Services (sequential)",
-        kind: "multiple",
+        kind: "cards",
         options: services
           .filter(
             (s) => s.active || selected.some((x) => x.service_id === s.id),
           )
           .map((s) => ({
             value: s.id,
-            label: `${s.name} · ${s.duration_minutes} min · ${php(s.price_php)}`,
+            label: s.name,
+            description: `${s.category} · ${s.duration_minutes} min`,
+            detail: php(s.price_php),
           })),
-        hint: "Hold Ctrl / Command to select several. End time includes cleanup buffers.",
+        hint: "Choose one or more services. Services run sequentially; end time includes cleanup buffers.",
       },
       { name: "notes", label: "Booking notes", kind: "textarea" },
     ];
