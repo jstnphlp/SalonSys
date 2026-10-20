@@ -22,7 +22,7 @@ export function parseCustomerListQuery(input: unknown) {
 
 export async function listCustomers(
   input: unknown,
-  organizationId: string | null = null,
+  organizationId: string,
 ): Promise<CustomerListResult> {
   const query = parseCustomerListQuery(input);
   await requirePermission(permissions.customersRead, organizationId);
@@ -52,7 +52,7 @@ export async function listCustomers(
   };
 }
 
-export async function getCustomerSummary(organizationId: string | null = null) {
+export async function getCustomerSummary(organizationId: string) {
   await requirePermission(permissions.customersRead, organizationId);
   const supabase = await createClient();
 
@@ -86,7 +86,7 @@ export async function getCustomerSummary(organizationId: string | null = null) {
 }
 
 export async function getRecentCustomers(
-  organizationId: string | null = null,
+  organizationId: string,
 ): Promise<Customer[]> {
   await requirePermission(permissions.customersRead, organizationId);
   const supabase = await createClient();

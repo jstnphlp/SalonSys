@@ -29,6 +29,11 @@ export const profileSchema = z.object({
     .min(1, "Enter your name.")
     .max(120, "Use no more than 120 characters."),
 });
+export const registerSchema = z.object({
+  fullName: profileSchema.shape.fullName,
+  email: z.email(),
+  password: z.string().min(8, "Use at least 8 characters.").max(72),
+});
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;

@@ -32,9 +32,11 @@ const statusVariant = {
 export function CustomerTable({
   result,
   role,
+  organizationId,
 }: {
   result: CustomerListResult;
   role: AppRole;
+  organizationId: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -66,7 +68,7 @@ export function CustomerTable({
           <div>
             <p className="font-medium text-foreground">{row.original.name}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              {row.original.email ?? "No email address"}
+              {row.original.phone ?? row.original.email ?? "No contact details"}
             </p>
           </div>
         ),
@@ -106,6 +108,7 @@ export function CustomerTable({
               permission={permissions.customersWrite}
             >
               <CustomerFormDialog
+                organizationId={organizationId}
                 customer={row.original}
                 trigger={
                   <Button
@@ -151,7 +154,7 @@ export function CustomerTable({
         ),
       },
     ],
-    [role, router],
+    [role, router, organizationId],
   );
 
   const sorting: SortingState = [
@@ -196,6 +199,7 @@ export function CustomerTable({
         </Select>
         <PermissionGuard role={role} permission={permissions.customersWrite}>
           <CustomerFormDialog
+            organizationId={organizationId}
             trigger={
               <Button>
                 <Plus /> Add customer
@@ -225,7 +229,7 @@ export function CustomerTable({
       emptyDescription={
         result.query.search || result.query.status !== "all"
           ? "Try a different search or status filter."
-          : "Add the first customer to begin using this reference feature."
+          : "Add your first customer to keep their contact details close at hand."
       }
       onPageChange={(pageIndex) => updateQuery({ page: pageIndex + 1 })}
       onPageSizeChange={(pageSize) => updateQuery({ pageSize, page: 1 })}

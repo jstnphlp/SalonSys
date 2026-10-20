@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizePhone } from "./domain";
 
 export const customerStatusSchema = z.enum(["lead", "active", "inactive"]);
 
@@ -11,10 +12,14 @@ export const customerFormSchema = z.object({
   email: z
     .union([z.literal(""), z.email("Enter a valid email address.")])
     .refine((value) => value.length <= 254, "Use no more than 254 characters."),
-  phone: z.string().trim().max(40, "Use no more than 40 characters."),
+  phone: z
+    .string()
+    .trim()
+    .max(40, "Use no more than 40 characters.")
+    .transform(normalizePhone),
   status: customerStatusSchema,
   notes: z.string().trim().max(2000, "Use no more than 2,000 characters."),
-  organizationId: z.union([z.literal(""), z.uuid()]).default(""),
+  organizationId: z.uuid(),
 });
 
 export const customerMutationSchema = customerFormSchema.extend({

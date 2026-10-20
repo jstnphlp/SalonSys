@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+﻿import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/features/auth/authorization", () => ({
@@ -21,6 +21,7 @@ const input = {
   phone: "",
   notes: "",
   status: "lead",
+  organizationId: "10000000-0000-4000-8000-000000000001",
 };
 
 describe("customer action boundary", () => {
@@ -52,12 +53,10 @@ describe("customer action boundary", () => {
     const chain = {
       insert: vi.fn(),
       select: vi.fn(),
-      single: vi
-        .fn()
-        .mockResolvedValue({
-          data: null,
-          error: { message: "private database details" },
-        }),
+      single: vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: "private database details" },
+      }),
     };
     chain.insert.mockReturnValue(chain);
     chain.select.mockReturnValue(chain);

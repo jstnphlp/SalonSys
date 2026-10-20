@@ -87,7 +87,10 @@ export function LoginForm({ nextPath }: { nextPath: string }) {
       </Button>
 
       <p className="text-center text-xs leading-5 text-muted-foreground">
-        Accounts are provided by your administrator.
+        New to SalonSys?{" "}
+        <Link href="/register" className="font-medium text-primary underline">
+          Create an account
+        </Link>
       </p>
     </form>
   );

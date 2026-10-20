@@ -16,7 +16,7 @@ export default async function LoginPage({
   return (
     <AuthFrame
       title="Welcome back"
-      description="Sign in with the account your administrator provided."
+      description="Your salon, team and working day, all in one place."
     >
       <LoginForm nextPath={safeRedirectPath(params.next ?? null)} />
     </AuthFrame>

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+﻿import { describe, expect, it } from "vitest";
 
 import {
   customerFormSchema,
@@ -6,6 +6,20 @@ import {
 } from "@/features/customers/schemas";
 
 describe("customer validation", () => {
+  it("normalizes Philippine mobile numbers and requires a salon", () => {
+    const input = {
+      name: "Demo",
+      email: "",
+      phone: "0917 000 0001",
+      status: "active",
+      notes: "",
+      organizationId: "10000000-0000-4000-8000-000000000001",
+    };
+    expect(customerFormSchema.parse(input).phone).toBe("+639170000001");
+    expect(
+      customerFormSchema.safeParse({ ...input, organizationId: "" }).success,
+    ).toBe(false);
+  });
   it("accepts and normalizes a valid customer form", () => {
     expect(
       customerFormSchema.parse({
@@ -14,7 +28,7 @@ describe("customer validation", () => {
         phone: "  +1 555 0100  ",
         status: "active",
         notes: "  Priority account  ",
-        organizationId: "",
+        organizationId: "10000000-0000-4000-8000-000000000001",
       }),
     ).toEqual({
       name: "Northstar Supplies",
@@ -22,7 +36,7 @@ describe("customer validation", () => {
       phone: "+1 555 0100",
       status: "active",
       notes: "Priority account",
-      organizationId: "",
+      organizationId: "10000000-0000-4000-8000-000000000001",
     });
   });
 

@@ -34,11 +34,13 @@ import type { Customer } from "@/features/customers/types";
 interface CustomerFormDialogProps {
   trigger: ReactElement;
   customer?: Customer;
+  organizationId: string;
 }
 
 export function CustomerFormDialog({
   trigger,
   customer,
+  organizationId,
 }: CustomerFormDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -57,7 +59,7 @@ export function CustomerFormDialog({
       phone: customer?.phone ?? "",
       status: customer?.status ?? "lead",
       notes: customer?.notes ?? "",
-      organizationId: customer?.organization_id ?? "",
+      organizationId,
     },
   });
 

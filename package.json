@@ -1,5 +1,5 @@
 {
-  "name": "business-app-starter",
+  "name": "salonsys",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -21,6 +21,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset --local",
     "db:types": "node scripts/db-types.mjs",
+    "db:types:embedded": "node scripts/db-types-embedded.mjs",
+    "test:domain-db": "node --test scripts/salon-workflow.test.mjs",
     "db:advisors": "supabase db advisors --local --type all --level warn --fail-on error",
     "db:test": "supabase test db --local"
   },
@@ -44,6 +46,7 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.10",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^7.0.1",

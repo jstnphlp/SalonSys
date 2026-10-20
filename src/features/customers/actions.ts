@@ -48,7 +48,7 @@ export async function createCustomerAction(
   if (!parsed.success) return validationError(parsed.error);
 
   try {
-    const organizationId = parsed.data.organizationId || null;
+    const organizationId = parsed.data.organizationId;
     const user = await requirePermission(
       permissions.customersWrite,
       organizationId,

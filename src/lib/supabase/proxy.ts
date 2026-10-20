@@ -5,7 +5,19 @@ import { getPublicEnv } from "@/config/env";
 import { safeRedirectPath } from "@/lib/auth/redirect";
 import type { Database } from "@/types/database.generated";
 
-const protectedPrefixes = ["/dashboard", "/customers", "/settings"];
+const protectedPrefixes = [
+  "/dashboard",
+  "/customers",
+  "/settings",
+  "/appointments",
+  "/attendance",
+  "/my-attendance",
+  "/payroll",
+  "/my-payslips",
+  "/staff",
+  "/services",
+  "/select-salon",
+];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

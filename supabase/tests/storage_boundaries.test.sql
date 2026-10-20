@@ -11,7 +11,7 @@ insert into storage.objects (bucket_id, name)
 values ('attachments', 'organizations/not-a-uuid/legacy.txt');
 
 set local role authenticated;
-set local request.jwt.claim.sub = '00000000-0000-0000-0000-000000000003';
+set local request.jwt.claim.sub = '00000000-0000-4000-8000-000000000003';
 select throws_ok(
   $$insert into storage.objects (bucket_id, name)
     values ('attachments', 'organizations/not-a-uuid/new.txt')$$,
@@ -36,7 +36,7 @@ select results_eq(
   array[1::bigint], 'denied delete preserves the object'
 );
 set local role authenticated;
-set local request.jwt.claim.sub = '00000000-0000-0000-0000-000000000001';
+set local request.jwt.claim.sub = '00000000-0000-4000-8000-000000000001';
 select throws_ok(
   $$insert into storage.objects (bucket_id, name)
     values ('attachments', 'organizations/not-a-uuid/admin.txt')$$,
@@ -50,7 +50,7 @@ select results_eq(
 set local role authenticated;
 select throws_ok(
   $$insert into public.file_records (object_path, original_name, mime_type, size_bytes)
-    values ('users/00000000-0000-0000-0000-000000000001/large.pdf', 'large.pdf', 'application/pdf', 4194305)$$,
+    values ('users/00000000-0000-4000-8000-000000000001/large.pdf', 'large.pdf', 'application/pdf', 4194305)$$,
   '23514', null, 'metadata cannot bypass the upload size limit'
 );
 select * from finish();

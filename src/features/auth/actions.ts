@@ -8,6 +8,7 @@ import {
   loginSchema,
   profileSchema,
   resetPasswordSchema,
+  registerSchema,
 } from "@/features/auth/schemas";
 import { getCurrentUser } from "@/features/auth/queries";
 import {
@@ -18,6 +19,31 @@ import {
 } from "@/lib/actions/result";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicEnv } from "@/config/env";
+
+export async function registerAction(
+  input: unknown,
+): Promise<ActionResult<{ signedIn: boolean }>> {
+  const parsed = registerSchema.safeParse(input);
+  if (!parsed.success) return validationError(parsed.error);
+  const supabase = await createClient();
+  const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
+  const { data, error } = await supabase.auth.signUp({
+    email: parsed.data.email,
+    password: parsed.data.password,
+    options: {
+      data: { full_name: parsed.data.fullName },
+      emailRedirectTo: `${NEXT_PUBLIC_SITE_URL}/auth/callback?next=/select-salon`,
+    },
+  });
+  if (error)
+    return actionError(
+      "Account could not be created. Try again or sign in if you already registered.",
+    );
+  return actionSuccess(
+    "Check your email to confirm your account, then sign in.",
+    { signedIn: !!data.session },
+  );
+}
 
 export async function loginAction(input: unknown): Promise<ActionResult> {
   const parsed = loginSchema.safeParse(input);

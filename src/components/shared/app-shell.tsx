@@ -1,279 +1,222 @@
-"use client";
-
+﻿"use client";
 import {
-  HomeIcon,
-  IdCardIcon,
-  SettingsIcon,
-  type HomeIconHandle,
-} from "lucide-animated";
-import { ChevronUp, LogOut, Menu, Settings } from "lucide-react";
-import { useReducedMotion } from "motion/react";
+  CalendarDays,
+  Clock3,
+  LayoutDashboard,
+  Wallet,
+  Users,
+  Scissors,
+  Contact,
+  Settings,
+  Menu,
+  LogOut,
+  ChevronDown,
+  ArrowUpRight,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  useRef,
-  type ForwardRefExoticComponent,
-  type HTMLAttributes,
-  type ReactNode,
-  type RefAttributes,
-} from "react";
-
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { appConfig } from "@/config/app";
+import type { ReactNode } from "react";
 import { signOutAction } from "@/features/auth/actions";
+import { hasPermission, type Permission } from "@/features/auth/permissions";
 import type { CurrentUser } from "@/features/auth/queries";
 import { cn } from "@/lib/utils";
-
-type AnimatedIconHandle = HomeIconHandle;
-
-type AnimatedIconComponent = ForwardRefExoticComponent<
-  HTMLAttributes<HTMLDivElement> & {
-    size?: number;
-    animateOnHover?: boolean;
-  } & RefAttributes<AnimatedIconHandle>
->;
-
-type NavigationItem = {
+const navigation: {
   label: string;
   href: string;
-  icon: AnimatedIconComponent;
-};
-
-const navigation: ReadonlyArray<NavigationItem> = [
-  { label: "Overview", href: "/dashboard", icon: HomeIcon },
-  { label: "Customers", href: "/customers", icon: IdCardIcon },
+  icon: LucideIcon;
+  permission: Permission;
+}[] = [
   {
-    label: "Profile settings",
-    href: "/settings/profile",
-    icon: SettingsIcon,
+    label: "Overview",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    permission: "dashboard:view",
+  },
+  {
+    label: "Appointments",
+    href: "/appointments",
+    icon: CalendarDays,
+    permission: "appointments:read",
+  },
+  {
+    label: "Attendance",
+    href: "/attendance",
+    icon: Clock3,
+    permission: "attendance:read",
+  },
+  {
+    label: "My attendance",
+    href: "/my-attendance",
+    icon: Clock3,
+    permission: "attendance:clock",
+  },
+  {
+    label: "Payroll",
+    href: "/payroll",
+    icon: Wallet,
+    permission: "payroll:manage",
+  },
+  {
+    label: "My payslips",
+    href: "/my-payslips",
+    icon: Wallet,
+    permission: "payslips:read",
+  },
+  { label: "Staff", href: "/staff", icon: Users, permission: "staff:read" },
+  {
+    label: "Services",
+    href: "/services",
+    icon: Scissors,
+    permission: "services:read",
+  },
+  {
+    label: "Customers",
+    href: "/customers",
+    icon: Contact,
+    permission: "customers:read",
+  },
+  {
+    label: "Settings",
+    href: "/settings/salon",
+    icon: Settings,
+    permission: "settings:manage",
   },
 ];
-
-interface AppShellProps {
+export function AppShell({
+  user,
+  salon,
+  children,
+}: {
   user: CurrentUser;
+  salon: { id: string; name: string } | null;
   children: ReactNode;
-}
-
-function Brand() {
-  return (
-    <Link
-      href="/dashboard"
-      className="flex min-w-0 items-center gap-2.5 text-sidebar-foreground"
-    >
-      <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-[0.65rem] font-bold tracking-tight text-sidebar-primary-foreground">
-        {appConfig.logo.mark}
-      </span>
-      <span className="min-w-0 leading-tight">
-        <span className="block truncate text-sm font-semibold tracking-tight">
-          {appConfig.name}
-        </span>
-        <span className="block text-xs text-sidebar-foreground/60">
-          Workspace
-        </span>
-      </span>
-    </Link>
-  );
-}
-
-function Navigation() {
+}) {
   const pathname = usePathname();
-
-  return (
+  const nav = (
     <nav aria-label="Primary navigation" className="space-y-1">
-      {navigation.map((item) => {
-        const active =
-          pathname === item.href ||
-          (item.href !== "/dashboard" && pathname.startsWith(item.href));
-
-        return <NavigationLink key={item.href} {...item} active={active} />;
-      })}
+      {salon &&
+        navigation
+          .filter((n) => hasPermission(user.role, n.permission))
+          .map((n) => (
+            <Link
+              key={n.href}
+              href={n.href}
+              onClick={(event) =>
+                event.currentTarget.closest("details")?.removeAttribute("open")
+              }
+              aria-current={
+                pathname === n.href || pathname.startsWith(n.href + "/")
+                  ? "page"
+                  : undefined
+              }
+              className={cn(
+                "flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-sidebar-foreground/65 transition-colors hover:bg-sidebar-accent hover:text-foreground",
+                (pathname === n.href || pathname.startsWith(n.href + "/")) &&
+                  "bg-sidebar-accent font-semibold text-primary",
+              )}
+            >
+              <n.icon className="size-[18px]" />
+              {n.label}
+            </Link>
+          ))}
     </nav>
   );
-}
-
-function NavigationLink({
-  label,
-  href,
-  icon: Icon,
-  active,
-}: {
-  label: string;
-  href: string;
-  icon: AnimatedIconComponent;
-  active: boolean;
-}) {
-  const iconRef = useRef<AnimatedIconHandle>(null);
-  const prefersReducedMotion = useReducedMotion();
-
-  function startIconAnimation() {
-    if (!prefersReducedMotion) iconRef.current?.startAnimation();
-  }
-
-  function stopIconAnimation() {
-    iconRef.current?.stopAnimation();
-  }
-
-  return (
+  const brand = (
     <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={cn(
-        "group flex min-h-10 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/65 transition-[background-color,color,transform] duration-150 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        active &&
-          "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm shadow-black/[0.03]",
-      )}
-      onPointerEnter={startIconAnimation}
-      onPointerLeave={stopIconAnimation}
-      onFocus={(event) => {
-        if (event.currentTarget.matches(":focus-visible")) {
-          startIconAnimation();
-        }
-      }}
-      onBlur={stopIconAnimation}
+      href="/dashboard"
+      className="flex items-center gap-2.5 text-lg font-semibold tracking-tight"
     >
-      <Icon
-        ref={iconRef}
-        aria-hidden="true"
-        animateOnHover={false}
-        size={16}
-        className={cn(
-          "shrink-0 transition-colors group-hover:text-sidebar-primary",
-          active && "text-sidebar-primary",
-        )}
-      />
-      {label}
+      <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
+        s
+      </span>
+      salonsys
+      <span className="size-1.5 rounded-full bg-primary" />
     </Link>
   );
-}
-function getInitials(fullName: string) {
-  return fullName
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-}
-
-function UserSummary({
-  user,
-  showChevron = false,
-}: {
-  user: CurrentUser;
-  showChevron?: boolean;
-}) {
-  const initials = getInitials(user.fullName);
-
-  return (
-    <div className="flex min-w-0 items-center gap-3">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-sidebar-primary/10 text-xs font-semibold text-sidebar-primary ring-1 ring-sidebar-primary/15">
-        {initials}
-      </span>
-      <span className="min-w-0 flex-1 leading-tight">
-        <span className="block truncate text-sm font-medium text-sidebar-foreground">
-          {user.fullName}
+  const workspace = (
+    <Link
+      className="flex items-center justify-between gap-3 rounded-xl border bg-card p-3 text-sm"
+      href="/select-salon"
+    >
+      <span className="min-w-0">
+        <span className="block text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">
+          Workspace
         </span>
-        <span className="block truncate text-xs text-sidebar-foreground/60 capitalize">
-          {user.role} account
+        <span className="block truncate font-medium">
+          {salon?.name ?? "Choose a salon"}
         </span>
       </span>
-      {showChevron ? (
-        <ChevronUp className="size-4 shrink-0 text-sidebar-foreground/45 transition-transform group-open:rotate-180" />
-      ) : null}
-    </div>
+      <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+    </Link>
   );
-}
-
-function AccountCard({ user }: { user: CurrentUser }) {
-  return (
-    <Card className="w-full overflow-hidden border-sidebar-border bg-popover text-popover-foreground shadow-lg shadow-black/8">
-      <CardContent className="p-2 sm:p-2">
-        <div className="flex items-center gap-3 rounded-lg bg-muted/60 p-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-            {getInitials(user.fullName)}
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">{user.fullName}</p>
-            <p className="truncate text-xs text-muted-foreground">
-              {user.email}
-            </p>
-          </div>
-          <Badge className="capitalize" variant="secondary">
-            {user.role}
-          </Badge>
-        </div>
-        <AccountLinks />
-      </CardContent>
-    </Card>
-  );
-}
-
-function AccountLinks() {
-  return (
-    <div className="mt-1 grid gap-0.5">
+  const account = (
+    <div className="space-y-3 border-t pt-4">
       <Link
         href="/settings/profile"
-        className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+        className="flex items-center gap-3 text-sm"
       >
-        <Settings className="size-4 text-muted-foreground" /> Profile settings
+        <span className="grid size-9 place-items-center rounded-full bg-primary/10 font-semibold text-primary">
+          {user.fullName.slice(0, 1)}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium">{user.fullName}</span>
+          <span className="text-xs text-muted-foreground capitalize">
+            {user.role === "admin" ? "Salon owner" : user.role}
+          </span>
+        </span>
+        <ArrowUpRight className="size-4" />
       </Link>
       <form action={signOutAction}>
-        <button className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
-          <LogOut className="size-4 text-muted-foreground" /> Sign out
+        <button className="flex items-center gap-2 text-xs text-muted-foreground">
+          <LogOut className="size-3.5" />
+          Sign out
         </button>
       </form>
     </div>
   );
-}
-
-export function AppShell({ user, children }: AppShellProps) {
   return (
-    <div className="min-h-svh bg-sidebar lg:grid lg:grid-cols-[16.5rem_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-svh bg-sidebar text-sidebar-foreground lg:flex lg:flex-col">
-        <div className="flex h-20 items-center px-5">
-          <Brand />
-        </div>
-        <div className="flex-1 px-3 pb-5">
-          <p className="mb-2 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-sidebar-foreground/40 uppercase">
-            Workspace
-          </p>
-          <Navigation />
-        </div>
-        <div className="p-3 pb-4">
-          <details className="group relative">
-            <summary
-              aria-label="Open account menu"
-              className="list-none rounded-xl p-2 transition-colors hover:bg-sidebar-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sidebar-ring [&::-webkit-details-marker]:hidden"
-            >
-              <UserSummary user={user} showChevron />
-            </summary>
-            <div className="absolute right-0 bottom-[calc(100%+0.5rem)] left-0 z-40">
-              <AccountCard user={user} />
-            </div>
-          </details>
-        </div>
+    <div className="min-h-svh lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <a
+        className="sr-only z-50 bg-card p-3 focus:not-sr-only focus:fixed"
+        href="#main-content"
+      >
+        Skip to content
+      </a>
+      <aside className="sticky top-0 hidden h-svh flex-col gap-7 border-r bg-sidebar p-5 lg:flex">
+        <div className="py-2">{brand}</div>
+        {workspace}
+        <div className="min-h-0 flex-1 overflow-y-auto">{nav}</div>
+        {account}
       </aside>
-
       <div className="min-w-0">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between bg-sidebar/95 px-4 text-sidebar-foreground backdrop-blur-md lg:hidden">
-          <Brand />
-          <details className="group relative">
-            <summary className="flex size-9 list-none items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-accent-foreground transition-colors hover:bg-sidebar-accent/80 [&::-webkit-details-marker]:hidden">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b bg-background/95 px-5 backdrop-blur-sm sm:px-8">
+          <div className="lg:hidden">{brand}</div>
+          <p className="hidden truncate text-sm font-medium lg:block">
+            {salon?.name ?? "Your salon workspace"}
+          </p>
+          <p className="hidden text-xs text-muted-foreground sm:block">
+            {new Intl.DateTimeFormat("en-PH", {
+              timeZone: "Asia/Manila",
+              weekday: "long",
+              month: "short",
+              day: "numeric",
+            }).format(new Date())}{" "}
+            · Manila
+          </p>
+          <details className="relative lg:hidden">
+            <summary className="grid size-10 list-none place-items-center rounded-lg border">
               <span className="sr-only">Open navigation</span>
-              <Menu className="size-4" />
+              <Menu className="size-5" />
             </summary>
-            <div className="absolute top-[calc(100%+0.75rem)] right-0 w-72">
-              <Card className="border-sidebar-border bg-popover p-2 text-popover-foreground shadow-xl shadow-black/10">
-                <div className="mb-2 px-2 py-1">
-                  <UserSummary user={user} />
-                </div>
-                <Navigation />
-                <AccountLinks />
-              </Card>
+            <div className="absolute top-12 right-0 max-h-[80svh] w-72 space-y-4 overflow-y-auto rounded-xl border bg-card p-4 shadow-lg">
+              {workspace}
+              {nav}
+              {account}
             </div>
           </details>
         </header>
-        <main className="min-w-0 bg-background lg:my-2 lg:mr-2 lg:min-h-[calc(100svh-1rem)] lg:rounded-[1.25rem] lg:ring-1 lg:ring-black/[0.04]">
+        <main id="main-content" className="min-w-0">
           {children}
         </main>
       </div>
