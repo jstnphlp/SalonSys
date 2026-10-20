@@ -84,17 +84,31 @@ for (const pilot of [
     const walkIn = `Pilot visit ${Date.now()}`;
     await dialog.getByLabel("Walk-in name (optional)").fill(walkIn);
     await dialog
-      .getByLabel("Assigned employee")
-      .selectOption({ label: pilot.employee });
-    await dialog.getByLabel("Start · Asia/Manila").fill(`${today()}T15:00`);
-    const option = dialog
-      .getByLabel("Services (sequential)")
-      .locator("option")
-      .filter({ hasText: pilot.service })
-      .first();
+      .getByRole("combobox", { name: "Assigned employee", exact: true })
+      .click();
+    await page
+      .getByRole("option", { name: pilot.employee, exact: true })
+      .click();
     await dialog
-      .getByLabel("Services (sequential)")
-      .selectOption((await option.getAttribute("value")) ?? "");
+      .getByLabel("Start · Asia/Manila date", { exact: true })
+      .fill(today());
+    await dialog
+      .getByRole("combobox", {
+        name: "Start · Asia/Manila time hour",
+        exact: true,
+      })
+      .click();
+    await page.getByRole("option", { name: "03", exact: true }).click();
+    await dialog
+      .getByRole("combobox", {
+        name: "Start · Asia/Manila time period",
+        exact: true,
+      })
+      .click();
+    await page.getByRole("option", { name: "PM", exact: true }).click();
+    await dialog
+      .getByRole("checkbox", { name: pilot.service, exact: true })
+      .check();
     await expect(dialog.getByText(/Estimated end:/)).toBeVisible();
     await dialog.getByRole("button", { name: "Save appointment" }).click();
     await page.getByRole("button").filter({ hasText: walkIn }).first().click();
@@ -129,8 +143,10 @@ for (const pilot of [
         .getByRole("button", { name: "Generate payroll", exact: true })
         .click();
       dialog = page.getByRole("dialog");
-      await dialog.getByLabel("Cutoff start").fill(today());
-      await dialog.getByLabel("Cutoff end (inclusive)").fill(today());
+      await dialog.getByLabel("Cutoff start", { exact: true }).fill(today());
+      await dialog
+        .getByLabel("Cutoff end (inclusive)", { exact: true })
+        .fill(today());
       await dialog.getByRole("button", { name: "Calculate preview" }).click();
       await expect(page).toHaveURL(/\/payroll\/[a-f0-9-]+$/);
       await expect(

@@ -49,7 +49,7 @@ export function SalonSettings({
                 name: "closed_dates",
                 label: "Closed dates",
                 kind: "dates",
-                hint: "YYYY-MM-DD, separated by commas.",
+                hint: "Choose dates when the salon is closed. Remove a date to reopen it.",
               },
               {
                 name: "payroll_frequency",

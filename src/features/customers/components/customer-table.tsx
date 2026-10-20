@@ -188,15 +188,14 @@ export function CustomerTable({
           aria-label="Filter by status"
           className="sm:w-40"
           value={result.query.status}
-          onChange={(event) =>
-            updateQuery({ status: event.target.value, page: 1 })
-          }
-        >
-          <option value="all">All statuses</option>
-          <option value="lead">Lead</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </Select>
+          onValueChange={(status) => updateQuery({ status, page: 1 })}
+          options={[
+            { value: "all", label: "All statuses" },
+            { value: "lead", label: "Lead" },
+            { value: "active", label: "Active" },
+            { value: "inactive", label: "Inactive" },
+          ]}
+        />
         <PermissionGuard role={role} permission={permissions.customersWrite}>
           <CustomerFormDialog
             organizationId={organizationId}

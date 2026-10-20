@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { DatePicker } from "@/components/ui/date-picker";
+import { isCalendarDate } from "@/lib/calendar";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -412,12 +414,12 @@ export function AppointmentCalendar({
           >
             <ChevronLeft />
           </Button>
-          <Input
-            type="date"
+          <DatePicker
+            label="Calendar date"
             aria-label="Calendar date"
             value={date}
-            onChange={(e) => {
-              if (e.target.value) go(e.target.value);
+            onValueChange={(value) => {
+              if (isCalendarDate(value)) go(value);
             }}
             className="w-40"
           />
@@ -441,28 +443,25 @@ export function AppointmentCalendar({
           className="w-auto min-w-40"
           aria-label="Filter employee"
           value={employee}
-          onChange={(e) => setEmployee(e.target.value)}
-        >
-          <option value="">All employees</option>
-          {staff.map((s) => (
-            <option value={s.id} key={s.id}>
-              {s.display_name}
-            </option>
-          ))}
-        </Select>
+          onValueChange={setEmployee}
+          options={[
+            { value: "", label: "All employees" },
+            ...staff.map((s) => ({ value: s.id, label: s.display_name })),
+          ]}
+        />
         <Select
           className="w-auto"
           aria-label="Filter booking status"
           value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
-          <option value="">All statuses</option>
-          {Object.entries(statusLabels).map(([v, label]) => (
-            <option value={v} key={v}>
-              {label}
-            </option>
-          ))}
-        </Select>
+          onValueChange={setStatus}
+          options={[
+            { value: "", label: "All statuses" },
+            ...Object.entries(statusLabels).map(([value, label]) => ({
+              value,
+              label,
+            })),
+          ]}
+        />
         <Input
           className="max-w-xs"
           placeholder="Search appointments…"

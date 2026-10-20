@@ -24,7 +24,10 @@ test("admin completes customer and file workflows", async ({ page }) => {
   await createDialog.getByLabel("Name").fill(customerName);
   await createDialog.getByLabel("Email").fill("playwright@example.test");
   await createDialog.getByLabel("Phone").fill("+1 555 010 9090");
-  await createDialog.getByLabel("Status").selectOption("active");
+  await createDialog
+    .getByRole("combobox", { name: "Status", exact: true })
+    .click();
+  await page.getByRole("option", { name: "Active", exact: true }).click();
   await createDialog.getByRole("button", { name: "Create customer" }).click();
 
   await expect(page.getByText(customerName, { exact: true })).toBeVisible();
@@ -41,13 +44,11 @@ test("admin completes customer and file workflows", async ({ page }) => {
 
   await page.getByRole("link", { name: "Profile settings" }).first().click();
   const attachments = page.getByRole("region", { name: "Attachments" });
-  await attachments
-    .getByLabel("Attachment", { exact: true })
-    .setInputFiles({
-      name: attachmentName,
-      mimeType: "text/plain",
-      buffer: Buffer.from("Synthetic pilot attachment."),
-    });
+  await attachments.getByLabel("Attachment", { exact: true }).setInputFiles({
+    name: attachmentName,
+    mimeType: "text/plain",
+    buffer: Buffer.from("Synthetic pilot attachment."),
+  });
   await attachments.getByRole("button", { name: "Upload" }).click();
   await expect(page.getByRole("link", { name: attachmentName })).toBeVisible();
 

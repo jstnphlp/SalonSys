@@ -163,14 +163,12 @@ export function AppDataTable<TData>({
               aria-label="Rows per page"
               className="h-8 w-18"
               value={String(pageSize)}
-              onChange={(event) => onPageSizeChange(Number(event.target.value))}
-            >
-              {[10, 20, 50].map((size) => (
-                <option key={size} value={size}>
-                  {size}
-                </option>
-              ))}
-            </Select>
+              onValueChange={(value) => onPageSizeChange(Number(value))}
+              options={[10, 20, 50].map((size) => ({
+                value: String(size),
+                label: String(size),
+              }))}
+            />
             <Button
               variant="outline"
               size="icon"

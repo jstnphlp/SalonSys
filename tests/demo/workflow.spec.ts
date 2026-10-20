@@ -1,5 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 
+async function choose(page: Page, label: string, option: string) {
+  await page.getByRole("combobox", { name: label, exact: true }).click();
+  await page.getByRole("option", { name: option, exact: true }).click();
+}
+
 async function confirm(page: Page, label: string) {
   await page.getByRole("button", { name: label, exact: true }).click();
   await page
@@ -80,12 +85,23 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
   let dialog = page.getByRole("dialog");
   const name = `Demo visit ${Date.now()}`;
   await dialog.getByLabel("Walk-in name (optional)").fill(name);
-  await dialog
-    .getByLabel("Assigned employee")
-    .selectOption({ label: "Sam Santos" });
-  const start = dialog.getByLabel("Start · Asia/Manila");
+  await choose(page, "Assigned employee", "Sam Santos");
+  const start = dialog.getByLabel("Start · Asia/Manila date", { exact: true });
   const today = (await start.inputValue()).slice(0, 10);
-  await start.fill(`${today}T16:00`);
+  await dialog
+    .getByRole("button", {
+      name: "Open Start · Asia/Manila date calendar",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByRole("grid")).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("grid")).toHaveCount(0);
+  await expect(start).toHaveValue(today);
+  await choose(page, "Start · Asia/Manila time hour", "04");
+  await choose(page, "Start · Asia/Manila time period", "PM");
   await dialog.getByText("Haircut & finish", { exact: true }).click();
   await dialog.getByText("Color consultation", { exact: true }).click();
   await expect(dialog.getByText("2 selected", { exact: true })).toBeVisible();
@@ -114,9 +130,7 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
     ).toHaveCount(0);
   }
   await page.keyboard.press("Escape");
-  await page
-    .getByLabel("View demo as")
-    .selectOption("00000000-0000-4000-8000-000000000003");
+  await choose(page, "View demo as", "Sam · Hair salon staff");
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto("/my-attendance");
   const clock = page.getByRole("region", { name: "Attendance clock" });
@@ -128,9 +142,7 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
   await expect(
     clock.getByRole("button", { name: "Clock in", exact: true }),
   ).toBeVisible();
-  await page
-    .getByLabel("View demo as")
-    .selectOption("00000000-0000-4000-8000-000000000001");
+  await choose(page, "View demo as", "Alex · Hair salon owner");
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto("/attendance");
   await page
@@ -142,8 +154,10 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
     .getByRole("button", { name: "Generate payroll", exact: true })
     .click();
   dialog = page.getByRole("dialog");
-  await dialog.getByLabel("Cutoff start").fill(today);
-  await dialog.getByLabel("Cutoff end (inclusive)").fill(today);
+  await dialog.getByLabel("Cutoff start", { exact: true }).fill(today);
+  await dialog
+    .getByLabel("Cutoff end (inclusive)", { exact: true })
+    .fill(today);
   await dialog.getByRole("button", { name: "Calculate preview" }).click();
   await expect(page).toHaveURL(/\/payroll\/[a-f0-9-]+$/);
   await expect(page.getByText(/Haircut & finish/).first()).toBeVisible();
@@ -162,9 +176,7 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
   await expect(
     page.getByRole("button", { name: "Mark paid", exact: true }),
   ).toHaveCount(0);
-  await page
-    .getByLabel("View demo as")
-    .selectOption("00000000-0000-4000-8000-000000000003");
+  await choose(page, "View demo as", "Sam · Hair salon staff");
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto("/my-payslips");
   await page
@@ -182,9 +194,7 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
   await expect(
     page.getByText("Sam Santos", { exact: true }).first(),
   ).toBeVisible();
-  await page
-    .getByLabel("View demo as")
-    .selectOption("00000000-0000-4000-8000-000000000004");
+  await choose(page, "View demo as", "Nico · Nail studio owner");
   await expect(page).toHaveURL(/\/dashboard$/);
   await page.goto("/services");
   await expect(page.getByText("Gel manicure", { exact: true })).toBeVisible();

@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type ReactElement } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import { FormMessage } from "@/components/shared/form-message";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ export function CustomerFormDialog({
   const [isPending, startTransition] = useTransition();
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setError,
@@ -152,15 +153,26 @@ export function CustomerFormDialog({
 
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor={`${customer?.id ?? "new"}-status`}>Status</Label>
-              <Select
-                id={`${customer?.id ?? "new"}-status`}
-                aria-invalid={Boolean(errors.status)}
-                {...register("status")}
-              >
-                <option value="lead">Lead</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </Select>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <Select
+                    id={`${customer?.id ?? "new"}-status`}
+                    aria-invalid={Boolean(errors.status)}
+                    name={field.name}
+                    ref={field.ref}
+                    onBlur={field.onBlur}
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    options={[
+                      { value: "lead", label: "Lead" },
+                      { value: "active", label: "Active" },
+                      { value: "inactive", label: "Inactive" },
+                    ]}
+                  />
+                )}
+              />
             </div>
 
             <div className="space-y-2 sm:col-span-2">

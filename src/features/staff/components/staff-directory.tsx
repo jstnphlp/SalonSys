@@ -60,7 +60,7 @@ export function StaffDirectory({
       label: "Service eligibility",
       kind: "multiple",
       options: services.map((s) => ({ value: s.id, label: s.name })),
-      hint: "Select none to allow all services. Hold Ctrl / Command to select several.",
+      hint: "Select eligible services, or leave empty to allow all services.",
     },
     {
       name: "working_hours",

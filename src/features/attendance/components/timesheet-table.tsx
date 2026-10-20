@@ -2,8 +2,8 @@
 import { useState } from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { DatePicker } from "@/components/ui/date-picker";
 import { RecordTable } from "@/components/shared/record-table";
 import { RecordDialog, type Field } from "@/components/shared/record-form";
 import { MutationButton } from "@/components/shared/mutation-button";
@@ -180,42 +180,33 @@ export function TimesheetTable({
           Employee
           <Select
             value={employee}
-            onChange={(e) => setEmployee(e.target.value)}
-          >
-            <option value="">All employees</option>
-            {staff.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.display_name}
-              </option>
-            ))}
-          </Select>
+            onValueChange={setEmployee}
+            options={[
+              { value: "", label: "All employees" },
+              ...staff.map((s) => ({ value: s.id, label: s.display_name })),
+            ]}
+          />
         </label>
         <label className="space-y-1 text-xs">
           Status
-          <Select value={status} onChange={(e) => setStatus(e.target.value)}>
-            <option value="">All shifts</option>
-            {["open", "submitted", "corrected", "approved"].map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </Select>
+          <Select
+            value={status}
+            onValueChange={setStatus}
+            options={[
+              { value: "", label: "All shifts" },
+              ...["open", "submitted", "corrected", "approved"].map(
+                (value) => ({ value, label: value.replaceAll("_", " ") }),
+              ),
+            ]}
+          />
         </label>
         <label className="space-y-1 text-xs">
           From
-          <Input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-          />
+          <DatePicker label="From" value={from} onValueChange={setFrom} />
         </label>
         <label className="space-y-1 text-xs">
           Through
-          <Input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
+          <DatePicker label="Through" value={to} onValueChange={setTo} />
         </label>
       </div>
       <RecordTable

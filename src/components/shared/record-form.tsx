@@ -1,13 +1,19 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useWatch } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { useState, useTransition, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { Select, MultiSelect } from "@/components/ui/select";
+import {
+  DatePicker,
+  DateTimePicker,
+  DatesPicker,
+  TimePicker,
+} from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { FormMessage } from "./form-message";
 import {
@@ -142,6 +148,10 @@ export function RecordForm({
                     {Array.isArray(fieldValue) ? fieldValue.length : 0} selected
                   </span>
                 </div>
+              ) : field.kind === "datetime-local" ? (
+                <p id={`${id}-label`} className="text-sm font-medium">
+                  {field.label}
+                </p>
               ) : (
                 <label htmlFor={id} className="text-sm font-medium">
                   {field.label}
@@ -223,20 +233,78 @@ export function RecordForm({
                     </p>
                   )}
                 </fieldset>
-              ) : field.kind === "select" || field.kind === "multiple" ? (
-                <Select
-                  id={id}
-                  multiple={field.kind === "multiple"}
-                  className={field.kind === "multiple" ? "h-32" : ""}
-                  {...register(field.name)}
-                  aria-invalid={!!error}
-                >
-                  {field.options?.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </Select>
+              ) : field.kind === "select" ? (
+                <Controller
+                  control={control}
+                  name={field.name}
+                  render={({ field: entry }) => (
+                    <Select
+                      id={id}
+                      name={entry.name}
+                      ref={entry.ref}
+                      onBlur={entry.onBlur}
+                      value={String(entry.value ?? "")}
+                      onValueChange={entry.onChange}
+                      options={field.options ?? []}
+                      aria-invalid={!!error}
+                      aria-describedby={error ? `${id}-error` : undefined}
+                    />
+                  )}
+                />
+              ) : field.kind === "multiple" ? (
+                <Controller
+                  control={control}
+                  name={field.name}
+                  render={({ field: entry }) => (
+                    <MultiSelect
+                      id={id}
+                      name={entry.name}
+                      ref={entry.ref}
+                      onBlur={entry.onBlur}
+                      value={Array.isArray(entry.value) ? entry.value : []}
+                      onValueChange={entry.onChange}
+                      options={field.options ?? []}
+                      aria-invalid={!!error}
+                      aria-describedby={error ? `${id}-error` : undefined}
+                      placeholder="Choose services"
+                    />
+                  )}
+                />
+              ) : field.kind === "date" ? (
+                <Controller
+                  control={control}
+                  name={field.name}
+                  render={({ field: entry }) => (
+                    <DatePicker
+                      id={id}
+                      name={entry.name}
+                      ref={entry.ref}
+                      onBlur={entry.onBlur}
+                      label={field.label}
+                      value={String(entry.value ?? "")}
+                      onValueChange={entry.onChange}
+                      aria-invalid={!!error}
+                      aria-describedby={error ? `${id}-error` : undefined}
+                    />
+                  )}
+                />
+              ) : field.kind === "datetime-local" ? (
+                <Controller
+                  control={control}
+                  name={field.name}
+                  render={({ field: entry }) => (
+                    <DateTimePicker
+                      id={id}
+                      inputRef={entry.ref}
+                      onBlur={entry.onBlur}
+                      label={field.label}
+                      value={String(entry.value ?? "")}
+                      onValueChange={entry.onChange}
+                      invalid={!!error}
+                      describedBy={error ? `${id}-error` : undefined}
+                    />
+                  )}
+                />
               ) : field.kind === "textarea" ? (
                 <Textarea
                   id={id}
@@ -244,19 +312,21 @@ export function RecordForm({
                   aria-invalid={!!error}
                 />
               ) : field.kind === "dates" ? (
-                <Input
-                  id={id}
-                  defaultValue={(defaults[field.name] as string[]).join(", ")}
-                  {...register(field.name, {
-                    setValueAs: (v) =>
-                      typeof v === "string"
-                        ? v
-                            .split(",")
-                            .map((s) => s.trim())
-                            .filter(Boolean)
-                        : v,
-                  })}
-                  aria-invalid={!!error}
+                <Controller
+                  control={control}
+                  name={field.name}
+                  render={({ field: entry }) => (
+                    <DatesPicker
+                      id={id}
+                      inputRef={entry.ref}
+                      onBlur={entry.onBlur}
+                      label={field.label}
+                      value={Array.isArray(entry.value) ? entry.value : []}
+                      onValueChange={entry.onChange}
+                      invalid={!!error}
+                      describedBy={error ? `${id}-error` : undefined}
+                    />
+                  )}
                 />
               ) : (
                 <Input
@@ -340,7 +410,7 @@ function HoursEditor({
           {days.map((day, i) => (
             <div
               key={day}
-              className="grid grid-cols-[5.5rem_1fr_1fr] items-center gap-2 text-xs"
+              className="grid gap-2 rounded-lg border border-border/60 p-2 text-xs sm:grid-cols-[4rem_minmax(0,1fr)_minmax(0,1fr)] sm:items-center"
             >
               <label className="flex items-center gap-1">
                 <input
@@ -358,31 +428,39 @@ function HoursEditor({
               </label>
               {value[i] ? (
                 <>
-                  <Input
-                    type="time"
-                    aria-label={`${day} opening`}
-                    value={value[i]![0]}
-                    onChange={(e) =>
-                      onChange({
-                        ...value,
-                        [i]: [e.target.value, value[i]![1]],
-                      })
-                    }
-                  />
-                  <Input
-                    type="time"
-                    aria-label={`${day} closing`}
-                    value={value[i]![1]}
-                    onChange={(e) =>
-                      onChange({
-                        ...value,
-                        [i]: [value[i]![0], e.target.value],
-                      })
-                    }
-                  />
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground">
+                      Opens
+                    </span>
+                    <TimePicker
+                      label={`${day} opening`}
+                      value={value[i]![0]}
+                      onValueChange={(time) =>
+                        onChange({
+                          ...value,
+                          [i]: [time, value[i]![1]],
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground">
+                      Closes
+                    </span>
+                    <TimePicker
+                      label={`${day} closing`}
+                      value={value[i]![1]}
+                      onValueChange={(time) =>
+                        onChange({
+                          ...value,
+                          [i]: [value[i]![0], time],
+                        })
+                      }
+                    />
+                  </div>
                 </>
               ) : (
-                <span className="col-span-2 text-muted-foreground">
+                <span className="text-muted-foreground sm:col-span-2">
                   Closed / unavailable
                 </span>
               )}

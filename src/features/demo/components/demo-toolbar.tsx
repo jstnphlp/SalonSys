@@ -27,19 +27,13 @@ export function DemoToolbar({ userId }: { userId: string }) {
           className="h-8 w-auto max-w-[150px] rounded-[10px] border-transparent bg-muted/60 text-[10px] lg:max-w-[210px]"
           value={userId}
           disabled={pending}
-          onChange={(e) => {
-            const id = e.target.value;
+          onValueChange={(id) => {
             start(async () => {
               await switchDemoAccountAction(id);
             });
           }}
-        >
-          {demoPeople.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </Select>
+          options={demoPeople.map((p) => ({ value: p.id, label: p.name }))}
+        />
         <ConfirmationDialog
           trigger={
             <Button

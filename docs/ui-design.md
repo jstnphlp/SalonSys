@@ -14,6 +14,8 @@ The implemented layout follows the local DentalSys reference in `Documents/proje
 
 Clean modern SaaS operations dashboard. Ivory canvas, strong warm ink text, subtle mauve separators and service/status accents; high contrast focus states. Flat controls with restrained rounded corners, no fake 3D/clay buttons, heavy gradients, random stock avatars, emoji navigation or aggressive shadows. Use existing Tailwind CSS, CSS semantic tokens and locally owned shadcn-style primitives instead of a new UI framework. Dark mode is optional after MVP; its tokens use the same plum and mauve family.
 
+Dropdowns use shared Base UI select menus with plum selection indicators, keyboard navigation and typeahead. Date fields use a shared calendar popover with month/year navigation, a keyboard-operable day grid, Today and Clear actions, and direct YYYY-MM-DD entry. Time fields use matching 12-hour hour/minute/AM-PM controls while retaining local 24-hour values for server validation. All business date/time inputs remain in Asia/Manila. Closed dates use the calendar and removable date chips. These controls replace browser-owned select and date/time panels throughout forms, filters and table pagination.
+
 ## Shell and navigation
 
 - Desktop (>=1024px): fixed slim left sidebar with brand/workspace, Overview, Appointments, Attendance, Payroll, Staff, Services, Customers; settings/account at bottom; content width optimized for dense information.
