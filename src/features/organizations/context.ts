@@ -38,12 +38,12 @@ export async function requireOrganizationContext(
       .maybeSingle(),
   ]);
 
-  if (!organization || (user.role !== "admin" && !membership)) {
+  if (!organization || !membership) {
     throw new AuthorizationError();
   }
 
   return {
     ...organization,
-    role: user.role === "admin" ? "admin" : membership!.role,
+    role: membership.role,
   };
 }

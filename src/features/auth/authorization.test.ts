@@ -51,4 +51,22 @@ describe("server authorization boundary", () => {
       requirePermission(permissions.customersWrite, "organization"),
     ).rejects.toBeInstanceOf(AuthorizationError);
   });
+
+  it("rejects a global admin without salon membership", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ ...user, role: "admin" });
+    const chain = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn().mockResolvedValue({ data: null }) };
+    chain.select.mockReturnValue(chain);
+    chain.eq.mockReturnValue(chain);
+    vi.mocked(createClient).mockResolvedValue({ from: () => chain } as unknown as Awaited<ReturnType<typeof createClient>>);
+    await expect(requirePermission(permissions.payrollManage, "another-salon")).rejects.toBeInstanceOf(AuthorizationError);
+  });
+
+  it("uses the membership role even for a global admin", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue({ ...user, role: "admin" });
+    const chain = { select: vi.fn(), eq: vi.fn(), maybeSingle: vi.fn().mockResolvedValue({ data: { role: "staff" } }) };
+    chain.select.mockReturnValue(chain);
+    chain.eq.mockReturnValue(chain);
+    vi.mocked(createClient).mockResolvedValue({ from: () => chain } as unknown as Awaited<ReturnType<typeof createClient>>);
+    await expect(requirePermission(permissions.payrollManage, "salon")).rejects.toBeInstanceOf(AuthorizationError);
+  });
 });

@@ -22,9 +22,11 @@ export async function requirePermission(
   const user = await getCurrentUser();
   if (!user) throw new AuthorizationError();
 
-  let effectiveRole: AppRole = user.role;
+  // Profile roles never confer business access. Unscoped access is limited to
+  // the starter's personal dashboard/files; salon operations require membership.
+  let effectiveRole: AppRole = "staff";
 
-  if (organizationId && user.role !== "admin") {
+  if (organizationId) {
     const supabase = await createClient();
     const { data: membership } = await supabase
       .from("organization_memberships")

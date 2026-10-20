@@ -1,10 +1,10 @@
 export const appConfig = {
-  name: "Business Starter",
-  shortName: "Starter",
-  description: "A practical workspace for day-to-day business operations.",
+  name: "SalonSys",
+  shortName: "SalonSys",
+  description: "Appointments, attendance, and transparent payroll for your salon.",
   logo: {
-    mark: "BS",
-    label: "Business Starter",
+    mark: "S",
+    label: "SalonSys",
   },
   supportEmail: "support@example.test",
 } as const;

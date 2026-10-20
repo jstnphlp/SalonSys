@@ -17,8 +17,11 @@ describe("role permissions", () => {
     expect(hasPermission("manager", permissions.membersManage)).toBe(false);
   });
 
-  it("keeps staff customer access read-only", () => {
-    expect(hasPermission("staff", permissions.customersRead)).toBe(true);
+  it("keeps customer contacts and team pay private from staff", () => {
+    expect(hasPermission("staff", permissions.customersRead)).toBe(false);
+    expect(hasPermission("staff", permissions.payrollManage)).toBe(false);
+    expect(hasPermission("manager", permissions.payrollManage)).toBe(false);
+    expect(hasPermission("staff", permissions.payslipsRead)).toBe(true);
     expect(hasPermission("staff", permissions.customersWrite)).toBe(false);
     expect(hasPermission("staff", permissions.customersDelete)).toBe(false);
   });
