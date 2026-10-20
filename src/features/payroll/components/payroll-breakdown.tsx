@@ -28,6 +28,7 @@ import {
   transitionPayrollAction,
   adjustPayrollAction,
 } from "../actions";
+import { presentPayrollLine, payrollLineLabels } from "../presentation";
 export function PayrollBreakdown({
   period,
   items,
@@ -249,29 +250,32 @@ export function PayrollBreakdown({
 function PayslipLines({ lines }: { lines: PayrollLine[] }) {
   return (
     <ul className="divide-y">
-      {lines.map((line) => (
-        <li
-          key={line.id}
-          className="flex items-start justify-between gap-4 py-3 text-sm"
-        >
-          <div className="min-w-0">
-            <p className="break-words">{line.description}</p>
-            <p className="mt-1 text-xs text-muted-foreground capitalize">
-              {line.kind}
-              {line.attendance_id
-                ? ` · Attendance ${line.attendance_id}`
-                : line.commission_id
-                  ? ` · Earning ${line.commission_id}`
-                  : ""}
-            </p>
-          </div>
-          <span className="shrink-0 tabular-nums">
-            {line.kind === "attendance"
-              ? "Source"
-              : `${line.kind === "deduction" ? "−" : ""}${php(line.amount_php)}`}
-          </span>
-        </li>
-      ))}
+      {lines.map((line) => {
+        const presentation = presentPayrollLine(line);
+        return (
+          <li
+            key={line.id}
+            className="flex items-start justify-between gap-4 py-3 text-sm"
+          >
+            <div className="min-w-0">
+              <p className="font-medium break-words">{presentation.title}</p>
+              {presentation.detail && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {presentation.detail}
+                </p>
+              )}
+              <p className="mt-1 text-xs text-muted-foreground">
+                {payrollLineLabels[line.kind]}
+              </p>
+            </div>
+            <span className="shrink-0 tabular-nums">
+              {line.kind === "attendance"
+                ? "Included in base pay"
+                : `${line.kind === "deduction" ? "−" : ""}${php(line.amount_php)}`}
+            </span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
