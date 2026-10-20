@@ -95,6 +95,7 @@ export function PayrollList({
         <RecordDialog
           title="Generate payroll preview"
           triggerLabel="Generate payroll"
+          triggerVariant="default"
           description="Uses approved attendance and earned service commissions. Cutoffs are inclusive Manila dates. Monthly pay uses your configured divisor; statutory deductions require reviewed manual entries."
           schema={periodSchema}
           defaults={{ start_date: start, end_date: today }}

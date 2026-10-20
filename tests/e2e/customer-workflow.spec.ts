@@ -15,7 +15,7 @@ test("admin completes customer and file workflows", async ({ page }) => {
 
   await signInAsAdmin(page);
   await expect(
-    page.getByRole("heading", { name: /Good day, Alex/ }),
+    page.getByRole("heading", { name: "Today", exact: true }),
   ).toBeVisible();
 
   await page.getByRole("link", { name: "Customers" }).first().click();
@@ -43,20 +43,18 @@ test("admin completes customer and file workflows", async ({ page }) => {
   const attachments = page.getByRole("region", { name: "Attachments" });
   await attachments
     .getByLabel("Attachment", { exact: true })
-    .setInputFiles({ name: attachmentName, mimeType: "text/plain", buffer: Buffer.from("Synthetic pilot attachment.") });
+    .setInputFiles({
+      name: attachmentName,
+      mimeType: "text/plain",
+      buffer: Buffer.from("Synthetic pilot attachment."),
+    });
   await attachments.getByRole("button", { name: "Upload" }).click();
-  await expect(
-    page.getByRole("link", { name: attachmentName }),
-  ).toBeVisible();
+  await expect(page.getByRole("link", { name: attachmentName })).toBeVisible();
 
-  await page
-    .getByRole("button", { name: `Delete ${attachmentName}` })
-    .click();
+  await page.getByRole("button", { name: `Delete ${attachmentName}` }).click();
   await page
     .getByRole("alertdialog")
     .getByRole("button", { name: "Delete file" })
     .click();
-  await expect(
-    page.getByRole("link", { name: attachmentName }),
-  ).toHaveCount(0);
+  await expect(page.getByRole("link", { name: attachmentName })).toHaveCount(0);
 });

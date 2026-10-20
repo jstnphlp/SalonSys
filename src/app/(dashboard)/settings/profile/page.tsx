@@ -23,7 +23,7 @@ export default async function ProfileSettingsPage() {
   ]);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-7 p-5 sm:p-7 lg:p-10">
+    <div className="page-wrap animate-rise-in">
       <PageHeader
         eyebrow="Settings"
         title="Profile"

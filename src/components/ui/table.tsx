@@ -6,7 +6,7 @@ function Table({ className, ...props }: ComponentProps<"table">) {
   return (
     <div className="relative w-full overflow-x-auto">
       <table
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn("w-full caption-bottom text-[13px]", className)}
         {...props}
       />
     </div>
@@ -14,11 +14,18 @@ function Table({ className, ...props }: ComponentProps<"table">) {
 }
 
 function TableHeader({ className, ...props }: ComponentProps<"thead">) {
-  return <thead className={cn("border-b", className)} {...props} />;
+  return (
+    <thead
+      className={cn("border-b border-border/60 bg-muted/35", className)}
+      {...props}
+    />
+  );
 }
 
 function TableBody({ className, ...props }: ComponentProps<"tbody">) {
-  return <tbody className={cn("divide-y", className)} {...props} />;
+  return (
+    <tbody className={cn("divide-y divide-border/60", className)} {...props} />
+  );
 }
 
 function TableRow({ className, ...props }: ComponentProps<"tr">) {
@@ -37,7 +44,7 @@ function TableHead({ className, ...props }: ComponentProps<"th">) {
   return (
     <th
       className={cn(
-        "h-11 px-4 text-left align-middle text-xs font-semibold tracking-wide text-muted-foreground uppercase",
+        "h-10 px-5 text-left align-middle text-[10px] font-semibold tracking-[0.11em] text-muted-foreground uppercase",
         className,
       )}
       {...props}
@@ -46,7 +53,9 @@ function TableHead({ className, ...props }: ComponentProps<"th">) {
 }
 
 function TableCell({ className, ...props }: ComponentProps<"td">) {
-  return <td className={cn("px-4 py-3 align-middle", className)} {...props} />;
+  return (
+    <td className={cn("px-5 py-3.5 align-middle", className)} {...props} />
+  );
 }
 
 export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow };

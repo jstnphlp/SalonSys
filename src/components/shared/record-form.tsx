@@ -311,16 +311,18 @@ export function RecordDialog({
   title,
   description,
   triggerLabel = "Edit",
+  triggerVariant = "outline",
   ...props
 }: RecordFormProps & {
   title: string;
   description: string;
   triggerLabel?: string;
+  triggerVariant?: "default" | "outline" | "ghost";
 }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+      <DialogTrigger render={<Button variant={triggerVariant} size="sm" />}>
         {triggerLabel}
       </DialogTrigger>
       <DialogContent className="max-h-[90svh] overflow-y-auto sm:max-w-2xl">

@@ -74,6 +74,7 @@ export function StaffDirectory({
       title={person ? "Edit employee" : "Add employee"}
       description="Employees can have an optional account for their own bookings, attendance and payslips."
       triggerLabel={person ? `Edit ${person.display_name}` : "Add employee"}
+      triggerVariant={person ? "outline" : "default"}
       schema={staffSchema}
       defaults={
         person

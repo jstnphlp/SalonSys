@@ -17,7 +17,6 @@ import {
 import { RecordDialog, type Field } from "@/components/shared/record-form";
 import { MutationButton } from "@/components/shared/mutation-button";
 import { EmptyState } from "@/components/shared/empty-state";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   addDays,
   businessDate,
@@ -37,6 +36,8 @@ import {
 } from "../schemas";
 import { nextStatuses } from "../domain";
 import { saveBookingAction, transitionBookingAction } from "../actions";
+import { ScheduleGrid } from "./schedule-grid";
+import { AppointmentStatusBadge } from "./appointment-status-badge";
 const statusLabels: Record<Appointment["status"], string> = {
   scheduled: "Scheduled",
   checked_in: "Checked in",
@@ -80,7 +81,7 @@ export function AppointmentCalendar({
   }[];
 }) {
   const router = useRouter();
-  const [view, setView] = useState("day");
+  const [view, setView] = useState("week");
   const [employee, setEmployee] = useState("");
   const [status, setStatus] = useState("");
   const [search, setSearch] = useState("");
@@ -157,6 +158,7 @@ export function AppointmentCalendar({
       <RecordDialog
         title={appointment ? "Edit appointment" : "New appointment"}
         triggerLabel={appointment ? "Edit / reschedule" : "New booking"}
+        triggerVariant={appointment ? "outline" : "default"}
         description="Choose services, a team member and a start time. Availability is checked when you save."
         schema={bookingSchema}
         defaults={
@@ -220,53 +222,68 @@ export function AppointmentCalendar({
       />
     );
   };
-  function event(a: Appointment) {
+  function event(a: Appointment, compact = false) {
     const picks = bookingServices.filter((s) => s.appointment_id === a.id);
+    const category =
+      services.find((s) => s.id === picks[0]?.service_id)?.category ??
+      "General";
     const color = [
-      "border-l-primary",
-      "border-l-blue-500",
-      "border-l-amber-500",
-    ][Math.abs(picks[0]?.service_id.charCodeAt(0) ?? 0) % 3];
+      "border-teal-500 bg-teal-50 text-teal-800",
+      "border-violet-500 bg-violet-50 text-violet-800",
+      "border-blue-500 bg-blue-50 text-blue-800",
+      "border-amber-500 bg-amber-50 text-amber-800",
+    ][Array.from(category).reduce((sum, c) => sum + c.charCodeAt(0), 0) % 4];
     return (
       <Dialog key={a.id}>
         <DialogTrigger
           render={
             <button
-              className={`w-full rounded-lg border border-l-[3px] bg-card p-3 text-left transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-primary ${color}`}
+              className={`w-full rounded-[10px] border-l-[3px] text-left transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-primary ${compact ? "h-full overflow-hidden px-2 py-1.5" : "p-3"} ${color}`}
             />
           }
         >
-          <span className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-primary">
-              {new Intl.DateTimeFormat("en-PH", {
-                timeZone: "Asia/Manila",
-                hour: "numeric",
-                minute: "2-digit",
-              }).format(new Date(a.start_at))}
-            </span>
-            <Badge
-              variant={
-                a.status === "completed"
-                  ? "success"
-                  : a.status === "cancelled" || a.status === "no_show"
-                    ? "muted"
-                    : "secondary"
-              }
-            >
-              {statusLabels[a.status]}
-            </Badge>
-          </span>
-          <span className="mt-2 block text-sm font-semibold">
-            {customers.find((c) => c.id === a.customer_id)?.name ??
-              a.walk_in_name}
-          </span>
-          <span className="mt-1 block text-xs text-muted-foreground">
-            {picks.map((s) => s.name_snapshot).join(" + ")}
-          </span>
-          <span className="mt-2 block text-xs text-muted-foreground">
-            {staff.find((s) => s.id === a.staff_id)?.display_name ??
-              "Assigned employee"}
-          </span>
+          {compact ? (
+            <>
+              <span className="block truncate text-[10px] leading-3 font-bold">
+                {new Intl.DateTimeFormat("en-PH", {
+                  timeZone: "Asia/Manila",
+                  hour: "numeric",
+                  minute: "2-digit",
+                }).format(new Date(a.start_at))}{" "}
+                ·{" "}
+                {customers.find((c) => c.id === a.customer_id)?.name ??
+                  a.walk_in_name}
+              </span>
+              <span className="mt-0.5 block truncate text-[9px] leading-3 opacity-75">
+                {picks.map((s) => s.name_snapshot).join(" + ")}
+              </span>
+              <span className="sr-only">{statusLabels[a.status]}</span>
+            </>
+          ) : (
+            <>
+              <span className="flex flex-wrap items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-primary">
+                  {new Intl.DateTimeFormat("en-PH", {
+                    timeZone: "Asia/Manila",
+                    hour: "numeric",
+                    minute: "2-digit",
+                  }).format(new Date(a.start_at))}
+                </span>
+                <AppointmentStatusBadge status={a.status} />
+              </span>
+              <span className="mt-2 block text-sm font-semibold">
+                {customers.find((c) => c.id === a.customer_id)?.name ??
+                  a.walk_in_name}
+              </span>
+              <span className="mt-1 block text-xs text-muted-foreground">
+                {picks.map((s) => s.name_snapshot).join(" + ")}
+              </span>
+              <span className="mt-2 block text-xs text-muted-foreground">
+                {staff.find((s) => s.id === a.staff_id)?.display_name ??
+                  "Assigned employee"}
+              </span>
+            </>
+          )}
         </DialogTrigger>
         <DialogContent className="max-h-[90svh] overflow-y-auto">
           <DialogHeader>
@@ -352,7 +369,9 @@ export function AppointmentCalendar({
               day: "numeric",
             }).format(new Date(`${day}T00:00:00+08:00`))}
           </h2>
-          {filtered.filter((a) => businessDate(a.start_at) === day).map(event)}
+          {filtered
+            .filter((a) => businessDate(a.start_at) === day)
+            .map((a) => event(a))}
           {!filtered.some((a) => businessDate(a.start_at) === day) && (
             <p className="rounded-lg border border-dashed p-5 text-sm text-muted-foreground">
               No appointments.
@@ -365,15 +384,15 @@ export function AppointmentCalendar({
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1 rounded-lg border bg-card p-1">
+        <div className="flex items-center rounded-[13px] bg-muted p-1 text-xs font-medium">
           {["day", "week", "list"].map((v) => (
             <Button
               key={v}
               size="sm"
-              variant={view === v ? "secondary" : "ghost"}
+              variant="ghost"
               aria-pressed={view === v}
               onClick={() => setView(v)}
-              className="capitalize"
+              className={`h-8 rounded-[10px] px-3 text-xs capitalize ${view === v ? "bg-white shadow-sm" : "text-muted-foreground"}`}
             >
               {v}
             </Button>
@@ -381,77 +400,75 @@ export function AppointmentCalendar({
         </div>
         {canManage && form()}
       </div>
-      <Card>
-        <CardContent className="flex flex-wrap items-center gap-3 p-4">
-          <div className="flex items-center gap-1">
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="Previous date"
-              onClick={() => go(addDays(date, view === "week" ? -7 : -1))}
-            >
-              <ChevronLeft />
-            </Button>
-            <Input
-              type="date"
-              aria-label="Calendar date"
-              value={date}
-              onChange={(e) => {
-                if (e.target.value) go(e.target.value);
-              }}
-              className="w-40"
-            />
-            <Button
-              size="icon"
-              variant="ghost"
-              aria-label="Next date"
-              onClick={() => go(addDays(date, view === "week" ? 7 : 1))}
-            >
-              <ChevronRight />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => go(businessDate())}
-            >
-              Today
-            </Button>
-          </div>
-          <Select
-            className="w-auto min-w-40"
-            aria-label="Filter employee"
-            value={employee}
-            onChange={(e) => setEmployee(e.target.value)}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1">
+          <Button
+            size="icon"
+            variant="ghost"
+            aria-label="Previous date"
+            onClick={() => go(addDays(date, view === "week" ? -7 : -1))}
           >
-            <option value="">All employees</option>
-            {staff.map((s) => (
-              <option value={s.id} key={s.id}>
-                {s.display_name}
-              </option>
-            ))}
-          </Select>
-          <Select
-            className="w-auto"
-            aria-label="Filter booking status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="">All statuses</option>
-            {Object.entries(statusLabels).map(([v, label]) => (
-              <option value={v} key={v}>
-                {label}
-              </option>
-            ))}
-          </Select>
+            <ChevronLeft />
+          </Button>
           <Input
-            className="max-w-xs"
-            placeholder="Search appointments…"
-            aria-label="Search appointments"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            type="date"
+            aria-label="Calendar date"
+            value={date}
+            onChange={(e) => {
+              if (e.target.value) go(e.target.value);
+            }}
+            className="w-40"
           />
-        </CardContent>
-      </Card>
+          <Button
+            size="icon"
+            variant="ghost"
+            aria-label="Next date"
+            onClick={() => go(addDays(date, view === "week" ? 7 : 1))}
+          >
+            <ChevronRight />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => go(businessDate())}
+          >
+            Today
+          </Button>
+        </div>
+        <Select
+          className="w-auto min-w-40"
+          aria-label="Filter employee"
+          value={employee}
+          onChange={(e) => setEmployee(e.target.value)}
+        >
+          <option value="">All employees</option>
+          {staff.map((s) => (
+            <option value={s.id} key={s.id}>
+              {s.display_name}
+            </option>
+          ))}
+        </Select>
+        <Select
+          className="w-auto"
+          aria-label="Filter booking status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+        >
+          <option value="">All statuses</option>
+          {Object.entries(statusLabels).map(([v, label]) => (
+            <option value={v} key={v}>
+              {label}
+            </option>
+          ))}
+        </Select>
+        <Input
+          className="max-w-xs"
+          placeholder="Search appointments…"
+          aria-label="Search appointments"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
       {!staff.length && canManage ? (
         <EmptyState
           icon={<CalendarDays />}
@@ -460,55 +477,40 @@ export function AppointmentCalendar({
         />
       ) : (
         <>
-          <div
-            className={view === "list" ? "hidden" : "hidden gap-4 md:grid"}
-            style={{
-              gridTemplateColumns: `repeat(${view === "week" ? 7 : Math.max(1, Math.min(staff.filter((s) => !employee || s.id === employee).length, 4))},minmax(0,1fr))`,
-            }}
-          >
-            {view === "week"
-              ? days.map((day) => (
-                  <section key={day} className="min-w-0 space-y-3">
-                    <h2
-                      className={`rounded-lg border p-3 text-center text-sm font-semibold ${day === businessDate() ? "bg-primary/10 text-primary" : "bg-card"}`}
-                    >
-                      {new Intl.DateTimeFormat("en-PH", {
-                        weekday: "short",
-                        day: "numeric",
-                        timeZone: "UTC",
-                      }).format(new Date(`${day}T00:00:00Z`))}
-                    </h2>
-                    {filtered
-                      .filter((a) => businessDate(a.start_at) === day)
-                      .map(event)}
-                  </section>
-                ))
-              : staff
-                  .filter((s) => !employee || s.id === employee)
-                  .map((s) => (
-                    <section className="min-w-0 space-y-3" key={s.id}>
-                      <h2 className="rounded-lg border bg-card p-3 text-sm font-semibold">
-                        {s.display_name}
-                      </h2>
-                      {filtered
-                        .filter(
-                          (a) =>
-                            a.staff_id === s.id &&
-                            businessDate(a.start_at) === date,
-                        )
-                        .map(event)}
-                      {!filtered.some(
-                        (a) =>
-                          a.staff_id === s.id &&
-                          businessDate(a.start_at) === date,
-                      ) && (
-                        <p className="p-4 text-xs text-muted-foreground">
-                          No appointments
-                        </p>
-                      )}
-                    </section>
-                  ))}
-          </div>
+          {view !== "list" && (
+            <div className="hidden md:block">
+              <ScheduleGrid
+                columns={
+                  view === "week"
+                    ? days.map((day) => ({
+                        id: day,
+                        label: new Intl.DateTimeFormat("en-PH", {
+                          weekday: "short",
+                          timeZone: "UTC",
+                        }).format(new Date(day + "T00:00:00Z")),
+                        detail: day.slice(8),
+                        selected: day === date,
+                        onSelect: () => go(day),
+                        appointments: filtered.filter(
+                          (a) => businessDate(a.start_at) === day,
+                        ),
+                      }))
+                    : staff
+                        .filter((s) => !employee || s.id === employee)
+                        .map((s) => ({
+                          id: s.id,
+                          label: s.display_name,
+                          appointments: filtered.filter(
+                            (a) =>
+                              a.staff_id === s.id &&
+                              businessDate(a.start_at) === date,
+                          ),
+                        }))
+                }
+                renderEvent={event}
+              />
+            </div>
+          )}
           <div className={view === "list" ? "" : "md:hidden"}>{agenda}</div>
         </>
       )}

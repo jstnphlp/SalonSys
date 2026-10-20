@@ -10,7 +10,9 @@
 
 ## Design direction
 
-Clean modern SaaS operations dashboard. Calm neutral/cream or near-white canvas, strong charcoal text, subtle separators, one muted adaptable accent (e.g. sage/teal); high contrast focus states. Flat controls with restrained rounded corners, no fake 3D/clay buttons, heavy gradients, random stock avatars, emoji navigation or aggressive shadows. Use existing Tailwind CSS, CSS semantic tokens and locally owned shadcn-style primitives instead of a new UI framework. Dark mode is optional after MVP.
+The implemented UI follows the local DentalSys reference in `Documents/projects/DentalSys`: a 230px sidebar, inset rounded white workspace, locally hosted Inter, charcoal primary controls, compact type and navigation, flat metric surfaces, table-led overview, and hour-grid calendar. Salon terminology, permissions and persisted workflows remain in SalonSys; DentalSys is a visual reference rather than an application dependency. Demo controls sit quietly in the top bar. Mobile uses the matching bottom navigation plus a drawer.
+
+Clean modern SaaS operations dashboard. Near-white canvas, strong charcoal text, subtle separators and service/status accents; high contrast focus states. Flat controls with restrained rounded corners, no fake 3D/clay buttons, heavy gradients, random stock avatars, emoji navigation or aggressive shadows. Use existing Tailwind CSS, CSS semantic tokens and locally owned shadcn-style primitives instead of a new UI framework. Dark mode is optional after MVP.
 
 ## Shell and navigation
 

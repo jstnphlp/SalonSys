@@ -10,11 +10,13 @@ export function MutationButton({
   description,
   action,
   input,
+  className,
 }: {
   label: string;
   description: string;
   action: (input: unknown) => Promise<ActionResult<unknown>>;
   input: unknown;
+  className?: string;
 }) {
   const router = useRouter();
   const [message, setMessage] = useState<{
@@ -25,7 +27,7 @@ export function MutationButton({
     <div className="space-y-2">
       <ConfirmationDialog
         trigger={
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className={className}>
             {label}
           </Button>
         }

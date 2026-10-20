@@ -4,14 +4,14 @@ import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-medium",
+  "inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] leading-4 font-semibold",
   {
     variants: {
       variant: {
         default: "bg-primary/10 text-primary",
         secondary: "bg-secondary text-secondary-foreground",
-        success: "bg-foreground/10 text-foreground",
-        warning: "bg-foreground/5 text-foreground",
+        success: "bg-emerald-50 text-emerald-700",
+        warning: "bg-amber-50 text-amber-700",
         muted: "bg-muted text-muted-foreground",
       },
     },

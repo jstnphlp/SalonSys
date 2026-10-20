@@ -34,6 +34,7 @@ export function ServiceCatalog({
       title={service ? "Edit service" : "Add service"}
       description="Prices and duration are saved on each booking. Changes apply to new bookings."
       triggerLabel={service ? `Edit ${service.name}` : "Add service"}
+      triggerVariant={service ? "outline" : "default"}
       schema={serviceSchema}
       defaults={
         service ?? {

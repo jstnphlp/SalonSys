@@ -16,8 +16,11 @@ export default async function DashboardLayout({
     optionalSalon(),
   ]);
   return (
-    <AppShell user={{ ...user, role: salon?.role ?? "staff" }} salon={salon}>
-      {isDemoMode() && <DemoToolbar userId={user.id} />}
+    <AppShell
+      user={{ ...user, role: salon?.role ?? "staff" }}
+      salon={salon}
+      demoControls={isDemoMode() ? <DemoToolbar userId={user.id} /> : undefined}
+    >
       {children}
     </AppShell>
   );

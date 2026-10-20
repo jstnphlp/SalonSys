@@ -11,11 +11,11 @@ export function DemoToolbar({ userId }: { userId: string }) {
     router = useRouter();
   return (
     <div
-      className="flex flex-wrap items-center justify-between gap-3 border-b border-amber-200 bg-amber-50 px-5 py-3 text-xs text-amber-950"
+      className="flex flex-wrap items-center gap-2 text-[10px] text-muted-foreground"
       data-no-print
     >
-      <p>
-        <strong>Demo mode</strong> · Sample data saved locally
+      <p className="rounded-md bg-muted px-2 py-1 text-[9px] font-semibold tracking-wide uppercase">
+        <strong>Demo mode</strong>
       </p>
       <div className="flex flex-wrap items-center gap-2">
         <label className="sr-only" htmlFor="demo-account">
@@ -24,7 +24,7 @@ export function DemoToolbar({ userId }: { userId: string }) {
         <Select
           id="demo-account"
           aria-label="View demo as"
-          className="w-auto max-w-full bg-white text-xs"
+          className="h-8 w-auto max-w-[150px] rounded-[10px] border-transparent bg-muted/60 text-[10px] lg:max-w-[210px]"
           value={userId}
           disabled={pending}
           onChange={(e) => {
@@ -42,7 +42,12 @@ export function DemoToolbar({ userId }: { userId: string }) {
         </Select>
         <ConfirmationDialog
           trigger={
-            <Button variant="outline" size="sm" disabled={pending}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-[10px]"
+              disabled={pending}
+            >
               Reset demo
             </Button>
           }

@@ -16,7 +16,7 @@ export default async function CustomersPage({
   const result = await listCustomers(params, user.id);
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-7 p-5 sm:p-7 lg:p-10">
+    <div className="page-wrap animate-rise-in">
       <PageHeader
         eyebrow="Your clients"
         title="Customers"
