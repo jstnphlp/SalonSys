@@ -4,6 +4,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getPublicEnv } from "@/config/env";
 import { safeRedirectPath } from "@/lib/auth/redirect";
 import type { Database } from "@/types/database.generated";
+import { isDemoMode } from "@/config/demo";
 
 const protectedPrefixes = [
   "/dashboard",
@@ -21,6 +22,20 @@ const protectedPrefixes = [
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
+  if (isDemoMode()) {
+    const signedOut =
+      request.cookies.get("demo-user-id")?.value === "signed-out";
+    if (
+      signedOut &&
+      protectedPrefixes.some((prefix) =>
+        request.nextUrl.pathname.startsWith(prefix),
+      )
+    )
+      return NextResponse.redirect(new URL("/login", request.url));
+    if (!signedOut && request.nextUrl.pathname === "/login")
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    return response;
+  }
   const env = getPublicEnv();
 
   const supabase = createServerClient<Database>(

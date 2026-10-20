@@ -1,5 +1,7 @@
 # SalonSys MVP implementation
 
+For a demo without Supabase, containers or database setup, use `pnpm demo`. The [database-free demo guide](demo.md) covers local persistence, sample roles and the verified browser walkthrough. Normal Supabase deployment verification below remains separate.
+
 Implemented on `main`, 20 October 2026. The application builds and the embedded PostgreSQL workflow checks pass. Full Supabase/browser release verification remains blocked by the local infrastructure described below. This is **not production payroll signoff**.
 
 Implementation commits: `4b70357` (tenant authorization foundation), `1ba92d3` (persisted SalonSys MVP, UI, migrations, demo data and automated tests). The documentation handoff is committed separately.

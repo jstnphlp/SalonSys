@@ -5,8 +5,11 @@ import { cookies } from "next/headers";
 
 import { getPublicEnv } from "@/config/env";
 import type { Database } from "@/types/database.generated";
+import { isDemoMode } from "@/config/demo";
+import { createDemoClient } from "@/features/demo/client";
 
 export async function createClient() {
+  if (isDemoMode()) return createDemoClient();
   const cookieStore = await cookies();
   const env = getPublicEnv();
 

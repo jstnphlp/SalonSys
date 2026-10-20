@@ -4,8 +4,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getPublicEnv } from "@/config/env";
 import { safeRedirectPath } from "@/lib/auth/redirect";
 import { createClient } from "@/lib/supabase/server";
+import { isDemoMode } from "@/config/demo";
 
 export async function GET(request: NextRequest) {
+  if (isDemoMode())
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   const code = request.nextUrl.searchParams.get("code");
   const tokenHash = request.nextUrl.searchParams.get("token_hash");
   const type = request.nextUrl.searchParams.get("type") as EmailOtpType | null;

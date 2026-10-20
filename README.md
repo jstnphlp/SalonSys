@@ -33,6 +33,8 @@ Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Supabase PostgreSQL
 
 ## Local development
 
+For an immediate **database-free demo**, run `pnpm demo` and open http://localhost:3000. Sample salons, role switching, working bookings/attendance/payroll and a reset control are included. See [demo instructions](docs/demo.md). The Supabase setup below is for normal operation.
+
 Prerequisites: Node.js 24, pnpm 11/Corepack, and local Supabase/Docker.
 
 ```bash

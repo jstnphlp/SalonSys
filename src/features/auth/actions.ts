@@ -19,12 +19,17 @@ import {
 } from "@/lib/actions/result";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicEnv } from "@/config/env";
+import { isDemoMode } from "@/config/demo";
 
 export async function registerAction(
   input: unknown,
 ): Promise<ActionResult<{ signedIn: boolean }>> {
   const parsed = registerSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
+  if (isDemoMode())
+    return actionError(
+      "Use a sample demo account. Switch accounts from the demo bar, or sign in with a sample email and Starter123!.",
+    );
   const supabase = await createClient();
   const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
   const { data, error } = await supabase.auth.signUp({
@@ -61,6 +66,11 @@ export async function forgotPasswordAction(
 ): Promise<ActionResult> {
   const parsed = forgotPasswordSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
+  if (isDemoMode())
+    return actionSuccess(
+      "Demo accounts use the password Starter123!. Email delivery is disabled for the local demo.",
+      undefined,
+    );
 
   const supabase = await createClient();
   const { NEXT_PUBLIC_SITE_URL } = getPublicEnv();
@@ -79,6 +89,10 @@ export async function resetPasswordAction(
 ): Promise<ActionResult> {
   const parsed = resetPasswordSchema.safeParse(input);
   if (!parsed.success) return validationError(parsed.error);
+  if (isDemoMode())
+    return actionError(
+      "Demo accounts use the fixed sample password Starter123!.",
+    );
 
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({

@@ -1,0 +1,148 @@
+import { expect, test, type Page } from "@playwright/test";
+
+async function confirm(page: Page, label: string) {
+  await page.getByRole("button", { name: label, exact: true }).click();
+  await page
+    .getByRole("alertdialog")
+    .getByRole("button", { name: label, exact: true })
+    .click();
+  await expect(page.getByRole("alertdialog")).toHaveCount(0);
+}
+test("database-free salon demo: pages, booking, punches, payroll and own payslip", async ({
+  page,
+}) => {
+  const externalRequests: string[] = [];
+  page.on("request", (req) => {
+    if (/supabase|59321|59322/.test(req.url()))
+      externalRequests.push(req.url());
+  });
+  await page.goto("/dashboard");
+  await expect(page.getByText("Demo mode", { exact: true })).toBeVisible();
+  await confirm(page, "Reset demo");
+  for (const route of [
+    "/appointments",
+    "/attendance",
+    "/payroll",
+    "/staff",
+    "/services",
+    "/customers",
+    "/settings/salon",
+    "/settings/profile",
+  ]) {
+    await page.goto(route);
+    await expect(
+      page.getByRole("heading", { name: "Something went wrong" }),
+    ).toHaveCount(0);
+    await expect(page.locator("h1")).toBeVisible();
+  }
+  await page.goto("/customers");
+  await page.getByRole("button", { name: "Add customer", exact: true }).click();
+  const customerName = `Demo client ${Date.now()}`;
+  await page
+    .getByRole("dialog")
+    .getByLabel("Name", { exact: true })
+    .fill(customerName);
+  await page
+    .getByRole("dialog")
+    .getByLabel("Phone", { exact: true })
+    .fill("09170000001");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Create customer", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByText(customerName, { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: `Delete ${customerName}`, exact: true })
+    .click();
+  await page
+    .getByRole("alertdialog")
+    .getByRole("button", { name: "Delete customer", exact: true })
+    .click();
+  await expect(page.getByText(customerName, { exact: true })).toHaveCount(0);
+  await page.goto("/appointments");
+  await page.getByRole("button", { name: "New booking", exact: true }).click();
+  let dialog = page.getByRole("dialog");
+  const name = `Demo visit ${Date.now()}`;
+  await dialog.getByLabel("Walk-in name (optional)").fill(name);
+  await dialog
+    .getByLabel("Assigned employee")
+    .selectOption({ label: "Sam Santos" });
+  const start = dialog.getByLabel("Start · Asia/Manila");
+  const today = (await start.inputValue()).slice(0, 10);
+  await start.fill(`${today}T16:00`);
+  await dialog
+    .getByLabel("Services (sequential)")
+    .selectOption("30000000-0000-4000-8000-000000000001");
+  await dialog.getByRole("button", { name: "Save appointment" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.getByRole("button").filter({ hasText: name }).first().click();
+  for (const label of ["Check in", "Start service", "Mark completed"])
+    await confirm(page, label);
+  await page.keyboard.press("Escape");
+  await page
+    .getByLabel("View demo as")
+    .selectOption("00000000-0000-4000-8000-000000000003");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.goto("/my-attendance");
+  const clock = page.getByRole("region", { name: "Attendance clock" });
+  await clock.getByRole("button", { name: "Clock in", exact: true }).click();
+  await expect(
+    clock.getByRole("button", { name: "Clock out", exact: true }),
+  ).toBeVisible();
+  await clock.getByRole("button", { name: "Clock out", exact: true }).click();
+  await expect(
+    clock.getByRole("button", { name: "Clock in", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByLabel("View demo as")
+    .selectOption("00000000-0000-4000-8000-000000000001");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.goto("/attendance");
+  await page
+    .getByRole("textbox", { name: "Search records" })
+    .fill("Sam Santos");
+  await confirm(page, "Approve shift");
+  await page.goto("/payroll");
+  await page
+    .getByRole("button", { name: "Generate payroll", exact: true })
+    .click();
+  dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Cutoff start").fill(today);
+  await dialog.getByLabel("Cutoff end (inclusive)").fill(today);
+  await dialog.getByRole("button", { name: "Calculate preview" }).click();
+  await expect(page).toHaveURL(/\/payroll\/[a-f0-9-]+$/);
+  await expect(page.getByText(/Haircut & finish/).first()).toBeVisible();
+  await confirm(page, "Mark reviewed");
+  await confirm(page, "Approve payroll");
+  await page.getByRole("button", { name: "Mark paid", exact: true }).click();
+  dialog = page.getByRole("dialog");
+  await dialog
+    .getByLabel("Payment method and reference")
+    .fill("Demo bank TEST-001");
+  await dialog.getByRole("button", { name: "Confirm mark paid" }).click();
+  await expect(
+    page.getByRole("button", { name: "Mark paid", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByLabel("View demo as")
+    .selectOption("00000000-0000-4000-8000-000000000003");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.goto("/my-payslips");
+  await page.getByRole("link", { name: "View payslip" }).first().click();
+  await expect(
+    page.getByRole("button", { name: "Print payslip" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Sam Santos", { exact: true }).first(),
+  ).toBeVisible();
+  await page
+    .getByLabel("View demo as")
+    .selectOption("00000000-0000-4000-8000-000000000004");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.goto("/services");
+  await expect(page.getByText("Gel manicure", { exact: true })).toBeVisible();
+  expect(externalRequests).toEqual([]);
+  await confirm(page, "Reset demo");
+});

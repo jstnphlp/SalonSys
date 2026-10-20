@@ -35,7 +35,11 @@ export function AttendanceClock({
     return () => clearInterval(id);
   }, []);
   return (
-    <Card className="border-primary/20 bg-primary/5">
+    <Card
+      role="region"
+      aria-label="Attendance clock"
+      className="border-primary/20 bg-primary/5"
+    >
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Clock3 className="size-5 text-primary" />
