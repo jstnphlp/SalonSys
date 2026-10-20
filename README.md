@@ -33,7 +33,11 @@ Next.js 16 App Router, React 19, TypeScript, Tailwind CSS 4, Supabase PostgreSQL
 
 ## Local development
 
-For an immediate **database-free demo**, run `pnpm demo` and open http://localhost:3000. Sample salons, role switching, working bookings/attendance/payroll and a reset control are included. See [demo instructions](docs/demo.md). The Supabase setup below is for normal operation.
+For the **database-free demo**, run `pnpm install` and `pnpm dev`, then open http://localhost:3000. No environment variables or Supabase installation are required. Demo mode is the default, including on Vercel. Sample salons, role switching, working bookings/attendance/payroll and a reset control are included. See [local and Vercel demo instructions](docs/demo.md).
+
+Vercel uses browser-scoped demo snapshots without a database or writable application filesystem. Local development keeps the existing JSON-file persistence. To deploy the current demo, use Vercel's standard Next.js build settings; no Supabase variables are needed.
+
+The setup below applies only when deliberately enabling the Supabase-backed implementation with `SALONSYS_DEMO_MODE=false`.
 
 Prerequisites: Node.js 24, pnpm 11/Corepack, and local Supabase/Docker.
 
@@ -43,6 +47,7 @@ pnpm install --frozen-lockfile
 cp .env.example .env.local
 pnpm db:start
 # Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local using local Supabase status.
+# Set SALONSYS_DEMO_MODE=false to use Supabase rather than the default demo.
 pnpm db:reset
 pnpm dev
 ```

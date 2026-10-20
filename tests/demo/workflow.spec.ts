@@ -95,8 +95,15 @@ test("database-free salon demo: pages, booking, punches, payroll and own payslip
     })
     .click();
   await expect(page.getByRole("grid")).toBeVisible();
+  const selectedDay = page.locator(`[data-calendar-day="${today}"]`);
+  await expect(selectedDay).toBeFocused();
   await page.keyboard.press("ArrowRight");
+  const tomorrow = new Date(Date.parse(`${today}T00:00:00Z`) + 86400000)
+    .toISOString()
+    .slice(0, 10);
+  await expect(page.locator(`[data-calendar-day="${tomorrow}"]`)).toBeFocused();
   await page.keyboard.press("ArrowLeft");
+  await expect(selectedDay).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("grid")).toHaveCount(0);
   await expect(start).toHaveValue(today);

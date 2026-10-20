@@ -44,7 +44,7 @@ export async function salonMutation<T>(
             : response.error.code === "23503"
               ? "A selected record does not belong to this salon or is no longer available."
               : response.error.code === "P0001" &&
-                  /^(Appointment is outside|Employee is unavailable|Employee is not qualified|You are already clocked|Clock in before|Only scheduled|Invalid .* transition|Attendance is allocated|Close the shift|This cutoff overlaps|This shift overlaps|Start time must|Finalized payroll|Every included employee|A preview with manual|Resolve negative|Account not found|Account must|Use another owner|Add employees)/.test(
+                  /^(The demo is full|Appointment is outside|Employee is unavailable|Employee is not qualified|You are already clocked|Clock in before|Only scheduled|Invalid .* transition|Attendance is allocated|Close the shift|This cutoff overlaps|This shift overlaps|Start time must|Finalized payroll|Every included employee|A preview with manual|Resolve negative|Account not found|Account must|Use another owner|Add employees)/.test(
                     response.error.message,
                   )
                 ? response.error.message

@@ -20,12 +20,16 @@ const owner = demoId(0, 1),
   staff = demoId(0, 3),
   org = demoId(1, 1);
 afterEach(() => vi.unstubAllEnvs());
-describe("explicit database-free demo mode", () => {
-  it("never falls back to demo access when production credentials are absent", () => {
+describe("standalone database-free demo mode", () => {
+  it("defaults to demo and requires an explicit switch for Supabase", () => {
+    vi.stubEnv("SALONSYS_DEMO_MODE", undefined);
+    expect(isDemoMode()).toBe(true);
     vi.stubEnv("SALONSYS_DEMO_MODE", "");
-    expect(isDemoMode()).toBe(false);
+    expect(isDemoMode()).toBe(true);
     vi.stubEnv("SALONSYS_DEMO_MODE", "true");
     expect(isDemoMode()).toBe(true);
+    vi.stubEnv("SALONSYS_DEMO_MODE", "false");
+    expect(isDemoMode()).toBe(false);
   });
   it("seeds both salons with data matching the existing screens' read contracts", () => {
     const state = createDemoSeed();

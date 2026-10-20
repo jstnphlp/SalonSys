@@ -46,7 +46,7 @@ export function DemoToolbar({ userId }: { userId: string }) {
             </Button>
           }
           title="Reset demo data?"
-          description="Replace local demo changes with the sample hair salon and nail studio. This resets the shared demo for everyone using this local server."
+          description="Restore the sample hair salon and nail studio. Saved demo changes will be cleared."
           confirmLabel="Reset demo"
           onConfirm={async () => {
             const result = await resetDemoAction();

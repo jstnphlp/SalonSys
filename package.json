@@ -17,6 +17,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:demo": "playwright test --config playwright.demo.config.ts",
+    "test:demo:hosted": "playwright test --config playwright.hosted-demo.config.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:start": "supabase start",

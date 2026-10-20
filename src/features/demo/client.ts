@@ -1,5 +1,6 @@
 import "server-only";
 import { cookies } from "next/headers";
+import { usesHostedDemoStorage } from "@/config/demo";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/types/database.generated";
@@ -243,7 +244,11 @@ export async function createDemoClient(): Promise<SupabaseClient<Database>> {
       try {
         const data = await withDemoState(
           (state) => executeDemoRpc(state, user, name, args),
-          !["salon_read", "salon_members"].includes(name),
+          !["salon_read", "salon_members"].includes(name) &&
+            // A Server Component cannot set response cookies. Page-view audit
+            // records are ephemeral in the hosted demo; business writes remain
+            // audited in the browser's persisted demo snapshot.
+            !(usesHostedDemoStorage() && name === "log_payslip_access"),
         );
         return { data, error: null };
       } catch (error) {
