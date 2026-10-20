@@ -1,5 +1,7 @@
 # SalonSys data model, tenancy and transaction plan
 
+Implementation and schema differences are recorded in [implementation status](implementation-status.md). Compensation is stored separately from general employee records; service-specific commission overrides use `service_commission_rules`.
+
 **Existing baseline:** `profiles`, `organizations`, `organization_memberships`, `customers`, `audit_events`, `file_records`. Existing nullable/unscoped customer data and starter roles are template behavior, **not** safe tenant policy for the new product. Use additive migrations with an explicit data migration/backfill strategy; do not edit applied migrations or hand-edit generated types.
 
 ## Tenancy decision

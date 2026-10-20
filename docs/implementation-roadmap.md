@@ -1,5 +1,7 @@
 # SalonSys implementation roadmap
 
+For the implemented application, verification evidence and outstanding infrastructure gates, see [implementation status](implementation-status.md). The baseline below describes the starter before implementation.
+
 **Baseline reviewed:** Next.js 16 + React 19 + Supabase modular monolith. Starter currently ships only auth, customers CRUD, generic overview, permission scaffold, RLS/audit and tests. This plan is **not** evidence that new features exist.
 
 ## Delivery priorities

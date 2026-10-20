@@ -2,7 +2,7 @@
 
 **SalonSys** is an admin-first salon operations platform for independent Philippine hair salons, nail studios, barbershops, and mixed beauty-service businesses. The initial release prioritizes **calendar booking, employee time-in/time-out, and payroll**, supported by configurable services, staff, and customer records.
 
-> **Project status:** Product requirements and implementation plan are documented. The current app code remains the original Next.js business-starter foundation (auth, customers reference CRUD, shell, RBAC, Supabase). Booking, attendance, payroll, and the new UI have **not** been implemented yet.
+> **Project status:** The persisted SalonSys MVP is implemented: salon setup, calendar bookings, attendance, payroll and payslips. Lint, typecheck, unit/database workflow tests and production build pass. Full Supabase and browser acceptance remain blocked by local infrastructure. See [implementation status, demo accounts and release gates](docs/implementation-status.md).
 
 ## MVP capabilities
 
@@ -45,7 +45,7 @@ pnpm db:reset
 pnpm dev
 ```
 
-The original starter template includes optional `pnpm template:init` for project rebranding; review its effects before using it on an already configured project. Template fixture credentials in the legacy starter README are **local-only**, not production accounts.
+Demo owner accounts are `admin@example.test` (hair salon) and `nail-owner@example.test` (nail studio), with local-only password `Starter123!`. Staff accounts and the complete walkthrough are in [implementation status](docs/implementation-status.md). Never use demo credentials in production.
 
 ```bash
 pnpm verify
